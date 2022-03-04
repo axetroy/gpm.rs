@@ -147,20 +147,23 @@ fn main() {
 
             println!("rename to {}", dest_dir.to_str().unwrap());
 
+            let temp_clone_dir_a = &temp_clone_dir.clone();
+            let temp_clone_parent_dir = temp_clone_dir_a.as_path().parent();
+
             if !ecode.success() {
-                fs::remove_dir_all(temp_clone_dir).unwrap();
-                assert!(ecode.success());
+                // remove clone temp dir
+                fs::remove_dir_all(temp_clone_parent_dir.unwrap()).unwrap_err();
+                process::exit(ecode.code().unwrap_or(1));
             } else {
-                let p = &temp_clone_dir.clone();
                 // rename to dest
                 match fs::rename(temp_clone_dir, dest_dir) {
                     Ok(_) => {
                         // remove clone temp dir
-                        fs::remove_dir_all(p.as_path().parent().unwrap()).unwrap_err();
+                        fs::remove_dir_all(temp_clone_parent_dir.unwrap()).unwrap_err();
                     }
                     Err(e) => {
                         // remove clone temp dir
-                        fs::remove_dir_all(p.as_path().parent().unwrap()).unwrap_err();
+                        fs::remove_dir_all(temp_clone_parent_dir.unwrap()).unwrap_err();
 
                         panic!("{}", e);
                     }
