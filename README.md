@@ -5,6 +5,10 @@
 ![License](https://img.shields.io/github/license/axetroy/gpm.rs.svg)
 ![Repo Size](https://img.shields.io/github/repo-size/axetroy/gpm.rs.svg)
 
+> If you have more than a dozen, even more project in your computer, how will you manage them? This is a problem!
+
+This is what this tool is to be resolved. The directory is hierarchically based on the Git address, similar to Golang's package management, which can organize your hundreds or even thousands of projects.
+
 ### Install
 
 1.  Shell (Mac/Linux)
@@ -45,6 +49,11 @@ SUBCOMMANDS:
 # clone project instead of git clone
 $ gpm clone https://github.com/axetroy/gpm.rs
 ```
+
+## Relative
+
+- [gpm.js](https://github.com/gpmer/gpm.js) - I used NodeJs written in many years ago.
+- [vscode-gpm](https://github.com/axetroy/vscode-gpm) - Integrate with vscode, I have been using this for a long time.
 
 ## LICENSE
 
