@@ -32,14 +32,15 @@ This is what this tool is to be resolved. The directory is hierarchically based 
 ```sh
 # show help information
 $ gpm --help
-gpm
+gpm v0.1.0
 A cli for manager you project with Golang style
 
 USAGE:
     gpm <SUBCOMMAND>
 
 OPTIONS:
-    -h, --help    Print help information
+    -h, --help       Print help information
+    -V, --version    Print version information
 
 SUBCOMMANDS:
     clone     Clones repos
