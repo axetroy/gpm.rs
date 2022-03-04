@@ -51,6 +51,7 @@ fn main() {
             Command::new("clone")
                 .about("Clones repos")
                 .arg(arg!(<REMOTE> "The remote to clone"))
+                .arg(arg!([OPTIONS] "The options for git clone command"))
                 .arg_required_else_help(true),
         )
         .subcommand(
@@ -103,8 +104,14 @@ fn main() {
 
     match matches.subcommand() {
         Some(("clone", sub_matches)) => {
-            let mut dest_dir = PathBuf::new();
             let url = sub_matches.value_of("REMOTE").expect("required");
+
+            let clone_args = match sub_matches.value_of("OPTIONS") {
+                Some(s) => s.split(" ").collect::<Vec<&str>>(),
+                _ => vec![],
+            };
+
+            let mut dest_dir = PathBuf::new();
             let gpm_root: &str = if rc.root.is_empty() {
                 panic!("did not found root config in profile.\ntry run the command 'gpm config add root <folder>'");
             } else if rc.root.len() == 1 {
@@ -122,11 +129,11 @@ fn main() {
                 }
             };
 
-            let repo_url = GitUrl::parse(url).unwrap();
+            let repo_url = GitUrl::parse(url).expect("invalid repository URL");
 
             dest_dir.push(gpm_root);
-            dest_dir.push(repo_url.host.unwrap());
-            dest_dir.push(repo_url.owner.unwrap());
+            dest_dir.push(repo_url.host.expect("invalid repository host"));
+            dest_dir.push(repo_url.owner.expect("invalid repository owner"));
             dest_dir.push(repo_url.name);
             dest_dir = find_path(dest_dir);
 
@@ -143,16 +150,18 @@ fn main() {
                 .arg("clone")
                 .arg(url)
                 .arg(dest_dir.to_str().unwrap())
+                .args(clone_args)
                 .spawn()
                 .expect("failed to execute child");
 
             let ecode = child.wait().expect("failed to wait on child");
 
-            println!("rename to {}", dest_dir.to_str().unwrap());
+            println!("Clone into '{}'", dest_dir.to_str().unwrap());
 
             if !ecode.success() {
-                // remove clone temp dir
-                fs::remove_dir_all(dest_dir).unwrap();
+                if dest_dir.exists() {
+                    fs::remove_dir_all(dest_dir).unwrap();
+                }
                 process::exit(ecode.code().unwrap_or(1));
             } else {
                 open_in_folder(&dest_dir);
