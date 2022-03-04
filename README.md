@@ -52,7 +52,7 @@ $ gpm clone https://github.com/axetroy/gpm.rs
 
 ## Relative
 
-- [gpm.js](https://github.com/gpmer/gpm.js) - I used NodeJs written in many years ago.
+- [gpm.js](https://github.com/gpmer/gpm.js) - I wrote with nodejs in many years ago.
 - [vscode-gpm](https://github.com/axetroy/vscode-gpm) - Integrate with vscode, I have been using this for a long time.
 
 ## LICENSE
