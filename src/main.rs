@@ -36,7 +36,7 @@ fn main() {
         )
         .subcommand(
             Command::new("config")
-                .about("Set configure")
+                .about("Update configure")
                 .subcommand(
                     Command::new("add")
                         .about("Add configure for a field")

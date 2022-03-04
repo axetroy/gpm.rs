@@ -26,7 +26,24 @@
 ## Usage
 
 ```sh
+# show help information
+$ gpm --help
+gpm
+A cli for manager you project with Golang style
 
+USAGE:
+    gpm <SUBCOMMAND>
+
+OPTIONS:
+    -h, --help    Print help information
+
+SUBCOMMANDS:
+    clone     Clones repos
+    config    Update configure
+    help      Print this message or the help of the given subcommand(s)
+
+# clone project instead of git clone
+$ gpm clone https://github.com/axetroy/gpm.rs
 ```
 
 ## LICENSE
