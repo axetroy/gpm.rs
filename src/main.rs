@@ -1,10 +1,12 @@
 #![deny(warnings)]
-
+mod find_path;
+mod open;
 use clap::{arg, Command};
+use find_path::find_path;
 use git_url_parse::GitUrl;
-use inquire::{error::InquireError, Select, Text};
+use inquire::{error::InquireError, Select};
+use open::open as open_in_folder;
 use serde::{Deserialize, Serialize};
-use std::env;
 use std::fs;
 use std::fs::File;
 use std::io::Read;
@@ -13,7 +15,6 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::process;
 use std::process::Command as ChildProcess;
-use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Preset {
@@ -54,8 +55,6 @@ fn main() {
 
     let rc: Preset = serde_json::from_str(&file_content).unwrap();
 
-    println!("{:?}", rc);
-
     match matches.subcommand() {
         Some(("clone", sub_matches)) => {
             let mut dest_dir = PathBuf::new();
@@ -77,69 +76,27 @@ fn main() {
                 }
             };
 
-            let u = GitUrl::parse(url).unwrap();
-
-            let start = SystemTime::now();
-            let since_the_epoch = start
-                .duration_since(UNIX_EPOCH)
-                .expect("Time went backwards")
-                .as_secs();
-
-            let temp_clone_dir = env::temp_dir()
-                .as_path()
-                .join("gpm_".to_owned() + u.name.as_str() + "_" + &since_the_epoch.to_string())
-                .join(u.name.as_str());
-
-            let name = u.name.clone();
+            let repo_url = GitUrl::parse(url).unwrap();
 
             dest_dir.push(gpm_root);
-            dest_dir.push(u.host.unwrap());
-            dest_dir.push(u.owner.unwrap());
-            dest_dir.push(u.name);
+            dest_dir.push(repo_url.host.unwrap());
+            dest_dir.push(repo_url.owner.unwrap());
+            dest_dir.push(repo_url.name);
+            dest_dir = find_path(dest_dir);
 
-            // if project has exist
-            // then try to rename
-            if Path::new(dest_dir.as_os_str()).exists() {
-                let options: Vec<&str> = vec!["Override", "Rename", "Cancel"];
-
-                let ans: Result<&str, InquireError> =
-                    Select::new("Project has exist, I want to:", options).prompt();
-
-                match ans {
-                    Ok("Override") => {}
-                    Ok("Rename") => {
-                        let new_project_name = Text::new("Please enter the new name of project:")
-                            .with_default(&(name + "-1"))
-                            .prompt();
-
-                        match new_project_name {
-                            Ok(val) => {
-                                dest_dir = dest_dir.parent().unwrap().join(val);
-                            }
-                            Err(_) => process::exit(0x0),
-                        };
-                    }
-                    Ok("Cancel") => process::exit(0x0),
-                    Ok(_) => process::exit(0x0),
-                    Err(_) => process::exit(0x0),
-                };
-            }
-
-            println!("{}", temp_clone_dir.to_str().unwrap());
-
-            let temp_clone_dir_will_be_removed = temp_clone_dir.clone();
+            let dest_dir_will_be_removed = dest_dir.clone();
 
             // remove temp dir when cancel the action
             ctrlc::set_handler(move || {
-                fs::remove_dir_all(temp_clone_dir_will_be_removed.as_path()).unwrap_err();
+                fs::remove_dir_all(dest_dir_will_be_removed.as_path()).unwrap_err();
                 println!("received Ctrl+C!");
             })
             .expect("Error setting Ctrl-C handler");
 
             let mut child = ChildProcess::new("git")
                 .arg("clone")
-                .arg("git@github.com:axetroy/prune.rs.git")
-                .arg(temp_clone_dir.to_str().unwrap())
+                .arg(url)
+                .arg(dest_dir.to_str().unwrap())
                 .spawn()
                 .expect("failed to execute child");
 
@@ -147,27 +104,12 @@ fn main() {
 
             println!("rename to {}", dest_dir.to_str().unwrap());
 
-            let temp_clone_dir_a = &temp_clone_dir.clone();
-            let temp_clone_parent_dir = temp_clone_dir_a.as_path().parent();
-
             if !ecode.success() {
                 // remove clone temp dir
-                fs::remove_dir_all(temp_clone_parent_dir.unwrap()).unwrap_err();
+                fs::remove_dir_all(dest_dir).unwrap();
                 process::exit(ecode.code().unwrap_or(1));
             } else {
-                // rename to dest
-                match fs::rename(temp_clone_dir, dest_dir) {
-                    Ok(_) => {
-                        // remove clone temp dir
-                        fs::remove_dir_all(temp_clone_parent_dir.unwrap()).unwrap_err();
-                    }
-                    Err(e) => {
-                        // remove clone temp dir
-                        fs::remove_dir_all(temp_clone_parent_dir.unwrap()).unwrap_err();
-
-                        panic!("{}", e);
-                    }
-                }
+                open_in_folder(&dest_dir);
             }
         }
         Some(("init", sub_matches)) => {
