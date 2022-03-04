@@ -4,17 +4,34 @@ mod open;
 use clap::{arg, Command};
 use find_path::find_path;
 use git_url_parse::GitUrl;
-use inquire::{error::InquireError, Select};
+use inquire::{error::InquireError, Confirm, Select};
 use open::open as open_in_folder;
 use serde::{Deserialize, Serialize};
+use std::env;
 use std::fs;
 use std::fs::File;
+use std::io;
 use std::io::Read;
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process;
 use std::process::Command as ChildProcess;
+
+fn get_absolute_path(path: impl AsRef<Path>) -> io::Result<PathBuf> {
+    let path = path.as_ref();
+
+    if path.is_absolute() {
+        Ok(path.to_path_buf())
+    } else {
+        let r = env::current_dir();
+        if let Ok(r) = r {
+            Ok(r.join(path))
+        } else {
+            Err(r.err().unwrap())
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Preset {
@@ -87,7 +104,7 @@ fn main() {
             let mut dest_dir = PathBuf::new();
             let url = sub_matches.value_of("REMOTE").expect("required");
             let gpm_root: &str = if rc.root.is_empty() {
-                panic!("did not found root folder in profile.");
+                panic!("did not found root config in profile.\ntry run the command 'gpm config add root <folder>'");
             } else if rc.root.len() == 1 {
                 let s = &rc.root[0].as_str();
                 s
@@ -147,8 +164,36 @@ fn main() {
 
                     match field {
                         "root" => {
-                            if !rc.root.contains(&value.to_string()) {
-                                rc.root.push(value.to_string());
+                            let add_abs_root_path = &get_absolute_path(&Path::new(value)).unwrap();
+
+                            if !add_abs_root_path.exists() {
+                                let ans = Confirm::new(
+                                    "The target folder not exist, do you want to create?",
+                                )
+                                .with_default(false)
+                                .with_help_message(
+                                    add_abs_root_path
+                                        .as_os_str()
+                                        .to_os_string()
+                                        .to_str()
+                                        .unwrap(),
+                                )
+                                .prompt();
+
+                                match ans {
+                                    Ok(true) => fs::create_dir(add_abs_root_path)
+                                        .expect("can not create folder"),
+                                    Ok(false) => process::exit(0x00),
+                                    Err(_) => process::exit(0x00),
+                                };
+                            } else if !add_abs_root_path.is_dir() {
+                                panic!("The target filepath is not a folder.")
+                            }
+
+                            let new_roo_str = add_abs_root_path.to_str().unwrap().to_string();
+
+                            if !rc.root.contains(&new_roo_str) {
+                                rc.root.push(new_roo_str);
                             }
                         }
                         _ => panic!("unknown configure field '{}' for add", field),
@@ -159,7 +204,37 @@ fn main() {
                     let value = sub_matches.value_of("VALUE").expect("required");
 
                     match field {
-                        "root" => rc.root = vec![value.to_string()],
+                        "root" => {
+                            let add_abs_root_path = &get_absolute_path(&Path::new(value)).unwrap();
+
+                            if !add_abs_root_path.exists() {
+                                let ans = Confirm::new(
+                                    "The target folder not exist, do you want to create?",
+                                )
+                                .with_default(false)
+                                .with_help_message(
+                                    add_abs_root_path
+                                        .as_os_str()
+                                        .to_os_string()
+                                        .to_str()
+                                        .unwrap(),
+                                )
+                                .prompt();
+
+                                match ans {
+                                    Ok(true) => fs::create_dir(add_abs_root_path)
+                                        .expect("can not create folder"),
+                                    Ok(false) => process::exit(0x00),
+                                    Err(_) => process::exit(0x00),
+                                };
+                            } else if !add_abs_root_path.is_dir() {
+                                panic!("The target filepath is not a folder.")
+                            }
+
+                            let new_roo_str = add_abs_root_path.to_str().unwrap().to_string();
+
+                            rc.root = vec![new_roo_str]
+                        }
                         _ => panic!("unknown configure field '{}' for set", field),
                     }
                 }
