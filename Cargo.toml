@@ -1,6 +1,6 @@
 [package]
 name = "gpm"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Axetroy <axetroy.dev@gmail.com>"]
 readme = "README.md"
 keywords = ["gpm", "git", "project", "manager"]

@@ -40,7 +40,7 @@ struct Preset {
 
 fn main() {
     let matches = Command::new("gpm")
-        .version("v0.1.0")
+        .version("v0.1.1")
         .author("Axetroy")
         .about("A command line tool, manage your hundreds of repository, written with Rust")
         .subcommand_required(true)
