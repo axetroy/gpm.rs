@@ -107,7 +107,7 @@ fn main() {
             let url = sub_matches.value_of("REMOTE").expect("required");
 
             let clone_args = match sub_matches.value_of("OPTIONS") {
-                Some(s) => s.split(" ").collect::<Vec<&str>>(),
+                Some(s) => s.split(' ').collect::<Vec<&str>>(),
                 _ => vec![],
             };
 
