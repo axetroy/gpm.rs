@@ -36,7 +36,7 @@ fn main() {
         .get_matches();
 
     let home_dir = dirs::home_dir().unwrap();
-    let mut gpm_rc = home_dir.clone();
+    let mut gpm_rc = home_dir;
     gpm_rc.push(".gpmrc");
 
     let is_gpm_rc_exist = Path::new(gpm_rc.as_os_str()).exists();
@@ -60,7 +60,7 @@ fn main() {
         Some(("clone", sub_matches)) => {
             let mut dest_dir = PathBuf::new();
             let url = sub_matches.value_of("REMOTE").expect("required");
-            let gpm_root: &str = if rc.root.len() == 0 {
+            let gpm_root: &str = if rc.root.is_empty() {
                 panic!("did not found root folder in profile.");
             } else if rc.root.len() == 1 {
                 let s = &rc.root[0].as_str();
@@ -71,12 +71,10 @@ fn main() {
                 let ans: Result<&str, InquireError> =
                     Select::new("Select a root path for clone?", options).prompt();
 
-                let matcher = match ans {
+                match ans {
                     Ok(choice) => choice,
                     Err(_) => process::exit(0x0),
-                };
-
-                matcher
+                }
             };
 
             let u = GitUrl::parse(url).unwrap();
@@ -116,7 +114,7 @@ fn main() {
 
                         match new_project_name {
                             Ok(val) => {
-                                dest_dir = dest_dir.parent().unwrap().join(val).to_path_buf();
+                                dest_dir = dest_dir.parent().unwrap().join(val);
                             }
                             Err(_) => process::exit(0x0),
                         };
@@ -158,13 +156,11 @@ fn main() {
                 match fs::rename(temp_clone_dir, dest_dir) {
                     Ok(_) => {
                         // remove clone temp dir
-                        fs::remove_dir_all(p.as_path().parent().unwrap().to_path_buf())
-                            .unwrap_err();
+                        fs::remove_dir_all(p.as_path().parent().unwrap()).unwrap_err();
                     }
                     Err(e) => {
                         // remove clone temp dir
-                        fs::remove_dir_all(p.as_path().parent().unwrap().to_path_buf())
-                            .unwrap_err();
+                        fs::remove_dir_all(p.as_path().parent().unwrap()).unwrap_err();
 
                         panic!("{}", e);
                     }
