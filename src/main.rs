@@ -34,6 +34,31 @@ fn main() {
                 .arg(arg!(<REMOTE> "The remote to clone"))
                 .arg_required_else_help(true),
         )
+        .subcommand(
+            Command::new("config")
+                .about("Set configure")
+                .subcommand(
+                    Command::new("add")
+                        .about("Add configure for a field")
+                        .arg(arg!(<FIELD> "The field of configure"))
+                        .arg(arg!(<VALUE> "The value of the field"))
+                        .arg_required_else_help(true),
+                )
+                .subcommand(
+                    Command::new("set")
+                        .about("Set configure for a field")
+                        .arg(arg!(<FIELD> "The field of configure"))
+                        .arg(arg!(<VALUE> "The value of the field"))
+                        .arg_required_else_help(true),
+                )
+                .subcommand(
+                    Command::new("remove")
+                        .about("Remove configure for a field")
+                        .arg(arg!(<FIELD> "The field of configure"))
+                        .arg_required_else_help(true),
+                )
+                .subcommand(Command::new("reset").about("Reset configure")),
+        )
         .get_matches();
 
     let home_dir = dirs::home_dir().unwrap();
@@ -46,14 +71,16 @@ fn main() {
         let mut file = File::create(gpm_rc.as_path()).expect("can not create a .gpmrc file");
         file.write_all(b"{\"root\": []}")
             .expect("can not write to $HOME/.gpmrc");
+        drop(file);
     }
 
-    let mut file = File::open(gpm_rc.as_path()).unwrap();
+    let mut rc_file = File::open(gpm_rc.as_path()).unwrap();
 
     let mut file_content = String::new();
-    file.read_to_string(&mut file_content).unwrap();
+    rc_file.read_to_string(&mut file_content).unwrap();
+    drop(rc_file);
 
-    let rc: Preset = serde_json::from_str(&file_content).unwrap();
+    let mut rc: Preset = serde_json::from_str(&file_content).unwrap();
 
     match matches.subcommand() {
         Some(("clone", sub_matches)) => {
@@ -112,11 +139,49 @@ fn main() {
                 open_in_folder(&dest_dir);
             }
         }
-        Some(("init", sub_matches)) => {
-            println!(
-                "Pushing to {}",
-                sub_matches.value_of("REMOTE").expect("required")
-            );
+        Some(("config", sub_matches)) => {
+            match sub_matches.subcommand() {
+                Some(("add", sub_matches)) => {
+                    let field = sub_matches.value_of("FIELD").expect("required");
+                    let value = sub_matches.value_of("VALUE").expect("required");
+
+                    match field {
+                        "root" => {
+                            if !rc.root.contains(&value.to_string()) {
+                                rc.root.push(value.to_string());
+                            }
+                        }
+                        _ => panic!("unknown configure field '{}' for add", field),
+                    }
+                }
+                Some(("set", sub_matches)) => {
+                    let field = sub_matches.value_of("FIELD").expect("required");
+                    let value = sub_matches.value_of("VALUE").expect("required");
+
+                    match field {
+                        "root" => rc.root = vec![value.to_string()],
+                        _ => panic!("unknown configure field '{}' for set", field),
+                    }
+                }
+                Some(("remove", _)) => {
+                    let field = sub_matches.value_of("FIELD").expect("required");
+
+                    match field {
+                        "root" => {
+                            rc.root = vec![];
+                        }
+                        _ => panic!("unknown configure field '{}' for remove", field),
+                    }
+                }
+                Some(("reset", _)) => {
+                    rc.root = vec![];
+                }
+                _ => unreachable!(),
+            }
+
+            let serialized = serde_json::to_string(&rc).unwrap();
+
+            fs::write(gpm_rc, serialized).expect("can not write to $HOME/.gpmrc");
         }
         Some((ext, sub_matches)) => {
             let args = sub_matches
@@ -125,7 +190,7 @@ fn main() {
                 .collect::<Vec<_>>();
             println!("Calling out to {:?} with {:?}", ext, args);
         }
-        _ => unreachable!(), // If all subcommands are defined above, anything else is unreachabe!()
+        _ => unreachable!(),
     }
 
     // Continued program logic goes here...
