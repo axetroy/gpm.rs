@@ -42,7 +42,7 @@ fn main() {
     let matches = Command::new("gpm")
         .version("v0.1.0")
         .author("Axetroy")
-        .about("A cli for manager you project with Golang style")
+        .about("A command line tool, manage your hundreds of repository, written with Rust")
         .subcommand_required(true)
         .arg_required_else_help(true)
         .allow_external_subcommands(true)

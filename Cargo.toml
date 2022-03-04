@@ -6,7 +6,7 @@ readme = "README.md"
 keywords = ["gpm", "git", "project", "manager"]
 repository = "https://github.com/axetroy/gpm.rs"
 description = """
-A cli tool for manager your git project with Golang style.
+A command line tool, manage your hundreds of repository, written with Rust.
 """
 
 edition = "2021"
