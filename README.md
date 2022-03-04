@@ -25,27 +25,13 @@ This is what this tool is to be resolved. The directory is hierarchically based 
 
 3.  [Github release page](https://github.com/axetroy/gpm.rs/releases)
 
-    download the executable file and put the executable file to `$PATH`
+    Download the executable, then put it in the `$PATH` directory.
 
 ## Usage
 
 ```sh
-# show help information
-$ gpm --help
-gpm v0.1.0
-A cli for manager you project with Golang style
-
-USAGE:
-    gpm <SUBCOMMAND>
-
-OPTIONS:
-    -h, --help       Print help information
-    -V, --version    Print version information
-
-SUBCOMMANDS:
-    clone     Clones repos
-    config    Update configure
-    help      Print this message or the help of the given subcommand(s)
+# config root path
+$ gpm config add root ~/gpm
 
 # clone project instead of git clone
 $ gpm clone https://github.com/axetroy/gpm.rs
