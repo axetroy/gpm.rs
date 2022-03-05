@@ -39,7 +39,7 @@ struct Preset {
 }
 
 fn main() {
-    let matches = Command::new("gpm")
+    let mut app = Command::new("gpm")
         .version("v0.1.1")
         .author("Axetroy")
         .about("A command line tool, manage your hundreds of repository, written with Rust")
@@ -53,6 +53,7 @@ fn main() {
                 .arg(arg!(<REMOTE> "The remote to clone"))
                 .arg(
                     Arg::new("OPTIONS")
+                        .required(false)
                         .multiple_occurrences(true)
                         .help("The git clone flags. eg. --progress --recursive"),
                 )
@@ -82,8 +83,7 @@ fn main() {
                         .arg_required_else_help(true),
                 )
                 .subcommand(Command::new("reset").about("Reset configure")),
-        )
-        .get_matches();
+        );
 
     let home_dir = dirs::home_dir().unwrap();
     let mut gpm_rc = home_dir;
@@ -105,6 +105,8 @@ fn main() {
     drop(rc_file);
 
     let mut rc: Preset = serde_json::from_str(&file_content).unwrap();
+
+    let matches = app.clone().get_matches();
 
     match matches.subcommand() {
         Some(("clone", sub_matches)) => {
@@ -322,7 +324,9 @@ fn main() {
                 .values_of_os("")
                 .unwrap_or_default()
                 .collect::<Vec<_>>();
-            println!("Calling out to {:?} with {:?}", ext, args);
+            println!("Unknown the command {:?} with argument {:?}", ext, args);
+            app.print_help().unwrap();
+            process::exit(0x1);
         }
         _ => unreachable!(),
     }
