@@ -13,3 +13,6 @@ format-check:
 
 format:
 	cargo fmt --all
+
+test:
+	cargo test --locked

@@ -1,37 +1,21 @@
 #![deny(warnings)]
 mod find_path;
 mod open;
+mod util;
 use clap::{arg, Arg, Command};
 use find_path::find_path;
 use git_url_parse::GitUrl;
 use inquire::{error::InquireError, Confirm, Select, Text};
 use open::open as open_in_folder;
 use serde::{Deserialize, Serialize};
-use std::env;
 use std::fs;
 use std::fs::File;
-use std::io;
 use std::io::Read;
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process;
 use std::process::Command as ChildProcess;
-
-fn get_absolute_path(path: impl AsRef<Path>) -> io::Result<PathBuf> {
-    let path = path.as_ref();
-
-    if path.is_absolute() {
-        Ok(path.to_path_buf())
-    } else {
-        let r = env::current_dir();
-        if let Ok(r) = r {
-            Ok(r.join(path))
-        } else {
-            Err(r.err().unwrap())
-        }
-    }
-}
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Preset {
@@ -246,7 +230,8 @@ fn main() {
 
                     match field {
                         "root" => {
-                            let add_abs_root_path = &get_absolute_path(&Path::new(value)).unwrap();
+                            let add_abs_root_path =
+                                &util::get_absolute_path(&Path::new(value)).unwrap();
 
                             if !add_abs_root_path.exists() {
                                 let ans = Confirm::new(
@@ -287,7 +272,8 @@ fn main() {
 
                     match field {
                         "root" => {
-                            let add_abs_root_path = &get_absolute_path(&Path::new(value)).unwrap();
+                            let add_abs_root_path =
+                                &util::get_absolute_path(&Path::new(value)).unwrap();
 
                             if !add_abs_root_path.exists() {
                                 let ans = Confirm::new(
