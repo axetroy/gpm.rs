@@ -1,9 +1,7 @@
 #![deny(warnings)]
-mod find_path;
 mod open;
 mod util;
 use clap::{arg, Arg, Command};
-use find_path::find_path;
 use git_url_parse::GitUrl;
 use inquire::{error::InquireError, Confirm, Select, Text};
 use open::open as open_in_folder;
@@ -150,7 +148,7 @@ fn main() {
                     Select::new("The project exist, then you want: ", options).prompt();
 
                 dest_dir = match ans {
-                    Ok("Auto") => find_path(dest_dir),
+                    Ok("Auto") => util::find_available_path(dest_dir),
                     Ok("Override") => {
                         let ans = Confirm::new("Override means that the original project will be deleted, are you sure you want to continue??")
                             .with_default(false)
