@@ -15,6 +15,7 @@ use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 use std::path::Path;
+use std::path::PathBuf;
 use std::process;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -349,23 +350,42 @@ fn main() {
         }
         Some(("open", sub_matches)) => {
             let url = sub_matches.value_of("REMOTE").expect("required");
+            let mut found: Vec<PathBuf> = vec![];
 
             for gpm_root in rc.root {
-                let dest_dir = git::url_to_path(&gpm_root, url).unwrap();
+                let repo_dir = git::url_to_path(&gpm_root, url).unwrap();
 
-                if dest_dir.exists() && dest_dir.is_dir() {
-                    println!(
-                        "Found the repository '{}'",
-                        dest_dir.as_os_str().to_str().unwrap()
-                    );
-                    file_explorer::open(&dest_dir);
-                    return;
+                if repo_dir.exists() && repo_dir.is_dir() {
+                    found.push(repo_dir.to_path_buf());
                 }
             }
 
-            println!("Did not found the cloned repository '{}'", url);
+            if found.is_empty() {
+                println!("Did not found the cloned repository '{}'", url);
+                process::exit(0x1);
+            }
 
-            process::exit(0x1);
+            if found.len() == 1 {
+                println!(
+                    "Found the repository '{}'",
+                    found[0].as_os_str().to_str().unwrap()
+                );
+                file_explorer::open(&found[0]);
+                process::exit(0x0);
+            }
+
+            let options: Vec<&str> = found
+                .iter()
+                .map(|s| s.as_os_str().to_str().unwrap())
+                .collect();
+
+            let ans: Result<&str, InquireError> =
+                Select::new("Select a repository to open:", options).prompt();
+
+            match ans {
+                Ok(choice) => file_explorer::open(Path::new(choice)),
+                Err(_) => process::exit(0x0),
+            }
         }
         Some((ext, sub_matches)) => {
             let args = sub_matches
