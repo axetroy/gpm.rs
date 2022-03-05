@@ -2,8 +2,8 @@
 
 use git_url_parse::GitUrl;
 use std::io;
-use std::path::PathBuf;
 use std::path::Path;
+use std::path::PathBuf;
 use std::process::Command as ChildProcess;
 
 // git url to a file path
