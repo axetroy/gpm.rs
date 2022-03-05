@@ -1,5 +1,7 @@
 #![deny(warnings)]
 
+use core::result::Result;
+use eyre::Report;
 use git_url_parse::GitUrl;
 use std::io;
 use std::path::Path;
@@ -7,17 +9,20 @@ use std::path::PathBuf;
 use std::process::Command as ChildProcess;
 
 // git url to a file path
-pub fn url_to_path(root: &str, url: &str) -> PathBuf {
-    let repo_url = GitUrl::parse(url).expect("invalid repository URL");
+pub fn url_to_path(root: &str, url: &str) -> Result<PathBuf, Report> {
+    match GitUrl::parse(url) {
+        Ok(r) => {
+            let mut dir = PathBuf::new();
 
-    let mut dir = PathBuf::new();
+            dir.push(root);
+            dir.push(r.host.expect("invalid repository host"));
+            dir.push(r.owner.expect("invalid repository owner"));
+            dir.push(r.name);
 
-    dir.push(root);
-    dir.push(repo_url.host.expect("invalid repository host"));
-    dir.push(repo_url.owner.expect("invalid repository owner"));
-    dir.push(repo_url.name);
-
-    dir.to_path_buf()
+            Ok(dir.to_path_buf())
+        }
+        Err(e) => Err(e),
+    }
 }
 
 pub fn clone(url: &str, dest: &Path, args: Vec<&str>) -> io::Result<bool> {
@@ -33,5 +38,27 @@ pub fn clone(url: &str, dest: &Path, args: Vec<&str>) -> io::Result<bool> {
             Err(e) => Err(e),
         },
         Err(e) => Err(e),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::git;
+
+    #[test]
+    fn test_url_to_path_when_empty() {
+        let url1 = "https://github.com/axetroy/gpm.rs";
+
+        let r1 = git::url_to_path("", url1);
+
+        assert!(!r1.is_err());
+        assert!(r1.is_ok());
+
+        let p1 = r1.ok().unwrap();
+
+        assert_eq!(
+            p1.as_os_str().to_str().unwrap(),
+            "github.com/axetroy/gpm.rs"
+        )
     }
 }

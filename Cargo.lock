@@ -267,6 +267,7 @@ dependencies = [
  "clap",
  "ctrlc",
  "dirs",
+ "eyre",
  "git-url-parse",
  "inquire",
  "serde",

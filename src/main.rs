@@ -129,7 +129,7 @@ fn main() {
                 }
             };
 
-            let mut dest_dir = git::url_to_path(gpm_root, url);
+            let mut dest_dir = git::url_to_path(gpm_root, url).unwrap();
 
             // if project exist
             if dest_dir.exists() {
