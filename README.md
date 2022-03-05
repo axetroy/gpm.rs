@@ -40,6 +40,17 @@ $ gpm clone https://github.com/axetroy/gpm.rs
 $ gpm clone https://github.com/axetroy/gpm.rs -- --progress --recursive
 ```
 
+## Command
+
+| Command                        | Description                  |
+| ------------------------------ | ---------------------------- |
+| gpm clone \<REMOTE\> [OPTIONS] | Clones repository            |
+| gpm config                     | Print configure              |
+| gpm config add <FIELD> <VALUE> | Add configure for a field    |
+| gpm config set <FIELD> <VALUE> | Set configure for a field    |
+| gpm config remove <FIELD>      | Remove configure for a field |
+| gpm config reset               | Reset configure              |
+
 ## Relative
 
 - [gpm.js](https://github.com/gpmer/gpm.js) - I wrote with nodejs in many years ago.
