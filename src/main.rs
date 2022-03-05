@@ -52,7 +52,9 @@ fn main() {
         )
         .subcommand(
             Command::new("config")
-                .about("The operation of configure, print the configure if command not provide.")
+                .about(
+                    "The operation of configure, print the configure if sub-command not provide.",
+                )
                 .subcommand(
                     Command::new("add")
                         .about("Add configure for a field")
