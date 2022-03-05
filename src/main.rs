@@ -1,10 +1,9 @@
 #![deny(warnings)]
-mod open;
+mod file_explorer;
 mod util;
 use clap::{arg, Arg, Command};
 use git_url_parse::GitUrl;
 use inquire::{error::InquireError, Confirm, Select, Text};
-use open::open as open_in_folder;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
@@ -181,7 +180,7 @@ fn main() {
                         new_dest_dir
                     }
                     Ok("Open") => {
-                        open_in_folder(&dest_dir);
+                        file_explorer::open(&dest_dir);
 
                         process::exit(0x0)
                     }
@@ -217,7 +216,7 @@ fn main() {
                 }
                 process::exit(ecode.code().unwrap_or(1));
             } else {
-                open_in_folder(&dest_dir);
+                file_explorer::open(&dest_dir);
             }
         }
         Some(("config", sub_matches)) => {
