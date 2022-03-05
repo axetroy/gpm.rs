@@ -3,6 +3,7 @@
 use git_url_parse::GitUrl;
 use std::io;
 use std::path::PathBuf;
+use std::path::Path;
 use std::process::Command as ChildProcess;
 
 // git url to a file path
@@ -19,7 +20,7 @@ pub fn url_to_path(root: &str, url: &str) -> PathBuf {
     dir.to_path_buf()
 }
 
-pub fn clone(url: &str, dest: &PathBuf, args: Vec<&str>) -> io::Result<bool> {
+pub fn clone(url: &str, dest: &Path, args: Vec<&str>) -> io::Result<bool> {
     match ChildProcess::new("git")
         .arg("clone")
         .arg(url)
