@@ -48,14 +48,17 @@ $ gpm clone https://github.com/axetroy/gpm.rs -- --progress --recursive
 
 ## Command
 
-| Command                            | Description                  |
-| ---------------------------------- | ---------------------------- |
-| gpm clone \<REMOTE\> [OPTIONS]     | Clones repository            |
-| gpm config                         | Print configure              |
-| gpm config add \<FIELD\> \<VALUE\> | Add configure for a field    |
-| gpm config set \<FIELD\> \<VALUE\> | Set configure for a field    |
-| gpm config remove \<FIELD\>        | Remove configure for a field |
-| gpm config reset                   | Reset configure              |
+| Command                            | Description                           |
+| ---------------------------------- | ------------------------------------- |
+| gpm clone \<REMOTE\> [OPTIONS]     | Clones repository                     |
+| gpm open <URL>                     | TODO: Open project with file explorer |
+| gpm list                           | TODO: List project                    |
+| gpm find <KEYWORD>                 | TODO: Find project                    |
+| gpm config                         | Print configure                       |
+| gpm config add \<FIELD\> \<VALUE\> | Add configure for a field             |
+| gpm config set \<FIELD\> \<VALUE\> | Set configure for a field             |
+| gpm config remove \<FIELD\>        | Remove configure for a field          |
+| gpm config reset                   | Reset configure                       |
 
 ## Relative
 
