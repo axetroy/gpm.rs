@@ -11,13 +11,9 @@ pub(crate) fn find_available_path(mut filepath: PathBuf) -> PathBuf {
     let base_name = origin.file_name().unwrap().to_str().unwrap();
 
     while filepath.exists() {
-        let mut name = base_name.to_string();
+        let new_name = format!("{}({})", base_name, index);
 
-        name.push('(');
-        name.push_str(index.to_string().as_str());
-        name.push(')');
-
-        filepath = filepath.parent().unwrap().join(name);
+        filepath = filepath.parent().unwrap().join(new_name);
 
         if !filepath.exists() {
             break;
