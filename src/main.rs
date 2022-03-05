@@ -247,6 +247,7 @@ fn main() {
                                 .to_string();
 
                             if !rc.root.contains(new_roo_str) {
+                                println!("Added '{}' to root of configure.", new_roo_str);
                                 rc.root.push(new_roo_str.to_owned());
                             }
                         }
@@ -292,6 +293,8 @@ fn main() {
                                 .unwrap()
                                 .to_string();
 
+                            println!("Set '[{}]' to root of configure.", new_roo_str);
+
                             rc.root = vec![new_roo_str.to_owned()]
                         }
                         _ => panic!("unknown configure field '{}' for set", field),
@@ -302,12 +305,14 @@ fn main() {
 
                     match field {
                         "root" => {
+                            println!("Remove root of configure.");
                             rc.root = vec![];
                         }
                         _ => panic!("unknown configure field '{}' for remove", field),
                     }
                 }
                 Some(("reset", _)) => {
+                    println!("Reset configure.");
                     rc.root = vec![];
                 }
                 _ => {
