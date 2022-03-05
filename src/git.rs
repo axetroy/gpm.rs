@@ -1,8 +1,11 @@
 #![deny(warnings)]
 
+extern crate path_absolutize;
+
 use core::result::Result;
 use eyre::Report;
 use git_url_parse::GitUrl;
+use path_absolutize::*;
 use std::io;
 use std::path::Path;
 use std::path::PathBuf;
@@ -19,7 +22,9 @@ pub fn url_to_path(root: &str, url: &str) -> Result<PathBuf, Report> {
             dir.push(r.owner.expect("invalid repository owner"));
             dir.push(r.name);
 
-            Ok(dir.to_path_buf())
+            let abs = dir.absolutize()?;
+
+            Ok(abs.to_path_buf())
         }
         Err(e) => Err(e),
     }
@@ -44,6 +49,7 @@ pub fn clone(url: &str, dest: &Path, args: Vec<&str>) -> io::Result<bool> {
 #[cfg(test)]
 mod tests {
     use crate::git;
+    use std::env;
 
     #[test]
     fn test_url_to_path_when_empty() {
@@ -55,11 +61,92 @@ mod tests {
         assert!(r1.is_ok());
 
         let p1 = r1.ok().unwrap();
+        let cwd = env::current_dir().unwrap();
 
         #[cfg(target_family = "unix")]
-        let result1: &str = "github.com/axetroy/gpm.rs";
+        let result1: &str =
+            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"/github.com/axetroy/gpm.rs");
         #[cfg(target_family = "windows")]
-        let result1: &str = "github.com\\axetroy\\gpm.rs";
+        let result1: &str =
+            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"\\github.com\\axetroy\\gpm.rs");
+
+        assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
+    }
+
+    #[test]
+    fn test_url_to_path_when_relative() {
+        let url1 = "https://github.com/axetroy/gpm.rs";
+
+        let r1 = git::url_to_path("gpm", url1);
+
+        assert!(!r1.is_err());
+        assert!(r1.is_ok());
+
+        let p1 = r1.ok().unwrap();
+        let cwd = env::current_dir().unwrap();
+
+        #[cfg(target_family = "unix")]
+        let result1: &str =
+            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"/gpm/github.com/axetroy/gpm.rs");
+        #[cfg(target_family = "windows")]
+        let result1: &str =
+            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"\\gpm\\github.com\\axetroy\\gpm.rs");
+
+        assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
+    }
+
+    #[test]
+    fn test_url_to_path_when_dot_relative() {
+        let url1 = "https://github.com/axetroy/gpm.rs";
+
+        let r1 = git::url_to_path("./gpm", url1);
+
+        assert!(!r1.is_err());
+        assert!(r1.is_ok());
+
+        let p1 = r1.ok().unwrap();
+        let cwd = env::current_dir().unwrap();
+
+        #[cfg(target_family = "unix")]
+        let result1: &str =
+            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"/gpm/github.com/axetroy/gpm.rs");
+        #[cfg(target_family = "windows")]
+        let result1: &str =
+            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"\\gpm\\github.com\\axetroy\\gpm.rs");
+
+        assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
+    }
+
+    #[test]
+    fn test_url_to_path_when_parent_relative() {
+        let url1 = "https://github.com/axetroy/gpm.rs";
+
+        let r1 = git::url_to_path("../gpm", url1);
+
+        assert!(!r1.is_err());
+        assert!(r1.is_ok());
+
+        let p1 = r1.ok().unwrap();
+        let cwd = env::current_dir().unwrap();
+
+        #[cfg(target_family = "unix")]
+        let result1: &str = &(cwd
+            .parent()
+            .unwrap()
+            .as_os_str()
+            .to_str()
+            .unwrap()
+            .to_owned()
+            + &"/gpm/github.com/axetroy/gpm.rs");
+        #[cfg(target_family = "windows")]
+        let result1: &str = &(cwd
+            .parent()
+            .unwrap()
+            .as_os_str()
+            .to_str()
+            .unwrap()
+            .to_owned()
+            + &"\\gpm\\github.com\\axetroy\\gpm.rs");
 
         assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
     }
