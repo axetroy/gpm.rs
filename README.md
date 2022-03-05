@@ -51,9 +51,9 @@ $ gpm clone https://github.com/axetroy/gpm.rs -- --progress --recursive
 | Command                            | Description                           |
 | ---------------------------------- | ------------------------------------- |
 | gpm clone \<REMOTE\> [OPTIONS]     | Clones repository                     |
-| gpm open <URL>                     | TODO: Open project with file explorer |
+| gpm open \<URL\>                   | TODO: Open project with file explorer |
 | gpm list                           | TODO: List project                    |
-| gpm find <KEYWORD>                 | TODO: Find project                    |
+| gpm find \<KEYWORD\>               | TODO: Find project                    |
 | gpm config                         | Print configure                       |
 | gpm config add \<FIELD\> \<VALUE\> | Add configure for a field             |
 | gpm config set \<FIELD\> \<VALUE\> | Set configure for a field             |
