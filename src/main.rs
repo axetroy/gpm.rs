@@ -45,6 +45,11 @@ fn main() {
         )
         .subcommand(Command::new("list").about("List cloned repositories"))
         .subcommand(
+            Command::new("open")
+                .about("Open repository with file explorer")
+                .arg(arg!(<REMOTE> "The remote Git URL to clone")),
+        )
+        .subcommand(
             Command::new("config")
                 .about("The operation of configure, print the configure if command not provide.")
                 .subcommand(
@@ -341,6 +346,26 @@ fn main() {
             for v in repositories {
                 println!("{}", v.as_os_str().to_str().unwrap())
             }
+        }
+        Some(("open", sub_matches)) => {
+            let url = sub_matches.value_of("REMOTE").expect("required");
+
+            for gpm_root in rc.root {
+                let dest_dir = git::url_to_path(&gpm_root, url).unwrap();
+
+                if dest_dir.exists() && dest_dir.is_dir() {
+                    println!(
+                        "Found the repository '{}'",
+                        dest_dir.as_os_str().to_str().unwrap()
+                    );
+                    file_explorer::open(&dest_dir);
+                    return;
+                }
+            }
+
+            println!("Did not found the cloned repository '{}'", url);
+
+            process::exit(0x1);
         }
         Some((ext, sub_matches)) => {
             let args = sub_matches
