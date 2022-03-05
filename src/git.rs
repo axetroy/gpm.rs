@@ -71,11 +71,15 @@ mod tests {
         let cwd = env::current_dir().unwrap();
 
         #[cfg(target_family = "unix")]
-        let result1: &str =
-            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"/github.com/axetroy/gpm.rs");
+        let result1: &str = &format!(
+            "{}/github.com/axetroy/gpm.rs",
+            cwd.as_os_str().to_str().unwrap().to_owned()
+        );
         #[cfg(target_family = "windows")]
-        let result1: &str =
-            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"\\github.com\\axetroy\\gpm.rs");
+        let result1: &str = &format!(
+            "{}\\github.com\\axetroy\\gpm.rs",
+            cwd.as_os_str().to_str().unwrap().to_owned()
+        );
 
         assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
     }
@@ -93,11 +97,15 @@ mod tests {
         let cwd = env::current_dir().unwrap();
 
         #[cfg(target_family = "unix")]
-        let result1: &str =
-            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"/gpm/github.com/axetroy/gpm.rs");
+        let result1: &str = &format!(
+            "{}/gpm/github.com/axetroy/gpm.rs",
+            cwd.as_os_str().to_str().unwrap().to_owned()
+        );
         #[cfg(target_family = "windows")]
-        let result1: &str =
-            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"\\gpm\\github.com\\axetroy\\gpm.rs");
+        let result1: &str = &format!(
+            "{}\\gpm\\github.com\\axetroy\\gpm.rs",
+            cwd.as_os_str().to_str().unwrap().to_owned()
+        );
 
         assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
     }
@@ -115,11 +123,15 @@ mod tests {
         let cwd = env::current_dir().unwrap();
 
         #[cfg(target_family = "unix")]
-        let result1: &str =
-            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"/gpm/github.com/axetroy/gpm.rs");
+        let result1: &str = &format!(
+            "{}/gpm/github.com/axetroy/gpm.rs",
+            cwd.as_os_str().to_str().unwrap().to_owned()
+        );
         #[cfg(target_family = "windows")]
-        let result1: &str =
-            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"\\gpm\\github.com\\axetroy\\gpm.rs");
+        let result1: &str = &format!(
+            "{}\\gpm\\github.com\\axetroy\\gpm.rs",
+            cwd.as_os_str().to_str().unwrap().to_owned()
+        );
 
         assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
     }
@@ -137,23 +149,25 @@ mod tests {
         let cwd = env::current_dir().unwrap();
 
         #[cfg(target_family = "unix")]
-        let result1: &str = &(cwd
-            .parent()
-            .unwrap()
-            .as_os_str()
-            .to_str()
-            .unwrap()
-            .to_owned()
-            + &"/gpm/github.com/axetroy/gpm.rs");
+        let result1: &str = &format!(
+            "{}/gpm/github.com/axetroy/gpm.rs",
+            cwd.parent()
+                .unwrap()
+                .as_os_str()
+                .to_str()
+                .unwrap()
+                .to_owned()
+        );
         #[cfg(target_family = "windows")]
-        let result1: &str = &(cwd
-            .parent()
-            .unwrap()
-            .as_os_str()
-            .to_str()
-            .unwrap()
-            .to_owned()
-            + &"\\gpm\\github.com\\axetroy\\gpm.rs");
+        let result1: &str = &format!(
+            "{}\\gpm\\github.com\\axetroy\\gpm.rs",
+            cwd.parent()
+                .unwrap()
+                .as_os_str()
+                .to_str()
+                .unwrap()
+                .to_owned()
+        );
 
         assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
     }
@@ -171,23 +185,25 @@ mod tests {
         let cwd = env::current_dir().unwrap();
 
         #[cfg(target_family = "unix")]
-        let result1: &str = &(cwd
-            .parent()
-            .unwrap()
-            .as_os_str()
-            .to_str()
-            .unwrap()
-            .to_owned()
-            + &"/gpm/gitlab.com/axetroy/gpm.rs");
+        let result1: &str = &format!(
+            "{}/gpm/gitlab.com/axetroy/gpm.rs",
+            cwd.parent()
+                .unwrap()
+                .as_os_str()
+                .to_str()
+                .unwrap()
+                .to_owned()
+        );
         #[cfg(target_family = "windows")]
-        let result1: &str = &(cwd
-            .parent()
-            .unwrap()
-            .as_os_str()
-            .to_str()
-            .unwrap()
-            .to_owned()
-            + &"\\gpm\\gitlab.com\\axetroy\\gpm.rs");
+        let result1: &str = &format!(
+            "{}\\gpm\\gitlab.com\\axetroy\\gpm.rs",
+            cwd.parent()
+                .unwrap()
+                .as_os_str()
+                .to_str()
+                .unwrap()
+                .to_owned()
+        );
 
         assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
     }
@@ -205,11 +221,15 @@ mod tests {
         let cwd = env::current_dir().unwrap();
 
         #[cfg(target_family = "unix")]
-        let result1: &str =
-            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"/gitlab.com/sub_org/gpm.rs");
+        let result1: &str = &format!(
+            "{}/gitlab.com/sub_org/gpm.rs",
+            cwd.as_os_str().to_str().unwrap().to_owned()
+        );
         #[cfg(target_family = "windows")]
-        let result1: &str =
-            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"\\gitlab.com\\sub_org\\gpm.rs");
+        let result1: &str = &format!(
+            "{}\\gitlab.com\\sub_org\\gpm.rs",
+            cwd.as_os_str().to_str().unwrap().to_owned()
+        );
 
         assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
     }
@@ -236,11 +256,15 @@ mod tests {
         let cwd = env::current_dir().unwrap();
 
         #[cfg(target_family = "unix")]
-        let result1: &str =
-            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"/github.com/axetroy/gpm.rs");
+        let result1: &str = &format!(
+            "{}/github.com/axetroy/gpm.rs",
+            cwd.as_os_str().to_str().unwrap().to_owned()
+        );
         #[cfg(target_family = "windows")]
-        let result1: &str =
-            &(cwd.as_os_str().to_str().unwrap().to_owned() + &"\\github.com\\axetroy\\gpm.rs");
+        let result1: &str = &format!(
+            "{}\\github.com\\axetroy\\gpm.rs",
+            cwd.as_os_str().to_str().unwrap().to_owned()
+        );
 
         assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
     }
