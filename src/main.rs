@@ -61,7 +61,7 @@ fn main() {
         )
         .subcommand(
             Command::new("config")
-                .about("Update configure")
+                .about("The operation of configure, print the configure if command not provide.")
                 .subcommand(
                     Command::new("add")
                         .about("Add configure for a field")
@@ -134,7 +134,8 @@ fn main() {
 
             let mut dest_dir = PathBuf::new();
             let gpm_root: &str = if rc.root.is_empty() {
-                panic!("did not found root config in profile.\ntry run the command 'gpm config add root <folder>'");
+                println!("Can not found root folder in the configure for clone. Try running the following command:\n\n    gpm config add root <folder>\n");
+                process::exit(0x1);
             } else if rc.root.len() == 1 {
                 let s = &rc.root[0].as_str();
                 s
