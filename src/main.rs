@@ -1,8 +1,8 @@
 #![deny(warnings)]
 mod file_explorer;
+mod git;
 mod util;
 use clap::{arg, Arg, Command};
-use git_url_parse::GitUrl;
 use inquire::{error::InquireError, Confirm, Select, Text};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -10,9 +10,7 @@ use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 use std::path::Path;
-use std::path::PathBuf;
 use std::process;
-use std::process::Command as ChildProcess;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Preset {
@@ -113,7 +111,6 @@ fn main() {
                 _ => vec![],
             };
 
-            let mut dest_dir = PathBuf::new();
             let gpm_root: &str = if rc.root.is_empty() {
                 println!("Can not found root folder in the configure for clone. Try running the following command:\n\n    gpm config add root <folder>\n");
                 process::exit(0x1);
@@ -132,12 +129,7 @@ fn main() {
                 }
             };
 
-            let repo_url = GitUrl::parse(url).expect("invalid repository URL");
-
-            dest_dir.push(gpm_root);
-            dest_dir.push(repo_url.host.expect("invalid repository host"));
-            dest_dir.push(repo_url.owner.expect("invalid repository owner"));
-            dest_dir.push(repo_url.name);
+            let mut dest_dir = git::url_to_path(gpm_root, url);
 
             // if project exist
             if dest_dir.exists() {
@@ -193,30 +185,20 @@ fn main() {
 
             // remove temp dir when cancel the action
             ctrlc::set_handler(move || {
-                fs::remove_dir_all(dest_dir_will_be_removed.as_path()).unwrap_err();
-                println!("received Ctrl+C!");
-            })
-            .expect("Error setting Ctrl-C handler");
-
-            let mut child = ChildProcess::new("git")
-                .arg("clone")
-                .arg(url)
-                .arg(dest_dir.to_str().unwrap())
-                .args(clone_args)
-                .spawn()
-                .expect("failed to execute child");
-
-            let ecode = child.wait().expect("failed to wait on child");
-
-            println!("Clone into '{}'", dest_dir.to_str().unwrap());
-
-            if !ecode.success() {
-                if dest_dir.exists() {
-                    fs::remove_dir_all(dest_dir).unwrap();
+                if dest_dir_will_be_removed.exists() {
+                    fs::remove_dir_all(dest_dir_will_be_removed.as_path()).unwrap();
                 }
-                process::exit(ecode.code().unwrap_or(1));
-            } else {
-                file_explorer::open(&dest_dir);
+            })
+            .unwrap_or_else(|e| println!("Error setting Ctrl-C handler: {}", e));
+
+            match git::clone(url, &dest_dir, clone_args) {
+                Ok(true) => file_explorer::open(&dest_dir),
+                _ => {
+                    if dest_dir.exists() {
+                        fs::remove_dir_all(dest_dir).unwrap();
+                        process::exit(0x1);
+                    }
+                }
             }
         }
         Some(("config", sub_matches)) => {
