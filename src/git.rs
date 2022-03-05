@@ -56,9 +56,11 @@ mod tests {
 
         let p1 = r1.ok().unwrap();
 
-        assert_eq!(
-            p1.as_os_str().to_str().unwrap(),
-            "github.com/axetroy/gpm.rs"
-        )
+        #[cfg(target_family = "unix")]
+        let result1: &str = "github.com/axetroy/gpm.rs";
+        #[cfg(target_family = "windows")]
+        let result1: &str = "github.com\\axetroy\\gpm.rs";
+
+        assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
     }
 }
