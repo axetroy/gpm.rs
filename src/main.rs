@@ -4,6 +4,7 @@ extern crate path_absolutize;
 mod file_explorer;
 mod git;
 mod util;
+mod walk;
 
 use clap::{arg, Arg, Command};
 use inquire::{error::InquireError, Confirm, Select, Text};
@@ -42,6 +43,7 @@ fn main() {
                 )
                 .arg_required_else_help(true),
         )
+        .subcommand(Command::new("list").about("List cloned repositories"))
         .subcommand(
             Command::new("config")
                 .about("The operation of configure, print the configure if command not provide.")
@@ -106,6 +108,26 @@ fn main() {
 
     let matches = app.clone().get_matches();
 
+    fn get_gpm_root(rc: &Preset) -> &str {
+        if rc.root.is_empty() {
+            println!("Can not found root folder in the configure for clone.\nTry running the following command to add a default folder:\n\n    gpm config add root $HOME/gpm\n\nOr set to a custom folder:\n\n    gpm config add root <folder>\n");
+            process::exit(0x1);
+        } else if rc.root.len() == 1 {
+            let s = &rc.root[0].as_str();
+            s
+        } else {
+            let options: Vec<&str> = rc.root.iter().map(|s| &**s).collect();
+
+            let ans: Result<&str, InquireError> =
+                Select::new("Select a root path for clone?", options).prompt();
+
+            match ans {
+                Ok(choice) => choice,
+                Err(_) => process::exit(0x0),
+            }
+        }
+    }
+
     match matches.subcommand() {
         Some(("clone", sub_matches)) => {
             let url = sub_matches.value_of("REMOTE").expect("required");
@@ -115,23 +137,7 @@ fn main() {
                 _ => vec![],
             };
 
-            let gpm_root: &str = if rc.root.is_empty() {
-                println!("Can not found root folder in the configure for clone.\nTry running the following command to add a default folder:\n\n    gpm config add root $HOME/gpm\n\nOr set to a custom folder:\n\n    gpm config add root <folder>\n");
-                process::exit(0x1);
-            } else if rc.root.len() == 1 {
-                let s = &rc.root[0].as_str();
-                s
-            } else {
-                let options: Vec<&str> = rc.root.iter().map(|s| &**s).collect();
-
-                let ans: Result<&str, InquireError> =
-                    Select::new("Select a root path for clone?", options).prompt();
-
-                match ans {
-                    Ok(choice) => choice,
-                    Err(_) => process::exit(0x0),
-                }
-            };
+            let gpm_root: &str = get_gpm_root(&rc);
 
             let mut dest_dir = git::url_to_path(gpm_root, url).unwrap();
 
@@ -326,6 +332,15 @@ fn main() {
             let serialized = serde_json::to_string(&rc).unwrap();
 
             fs::write(gpm_rc, serialized).expect("can not write to $HOME/.gpmrc");
+        }
+        Some(("list", _)) => {
+            let gpm_root: &str = get_gpm_root(&rc);
+            let root = Path::new(gpm_root);
+            let repositories = walk::walk_root(root).unwrap();
+
+            for v in repositories {
+                println!("{}", v.as_os_str().to_str().unwrap())
+            }
         }
         Some((ext, sub_matches)) => {
             let args = sub_matches
