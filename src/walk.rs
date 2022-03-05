@@ -30,7 +30,13 @@ pub fn walk_root(dir: &Path) -> io::Result<Vec<PathBuf>> {
         }
     }
 
-    repositories.sort();
+    repositories.sort_by(|a, b| {
+        a.as_os_str()
+            .to_str()
+            .unwrap()
+            .to_lowercase()
+            .cmp(&b.as_os_str().to_str().unwrap().to_lowercase())
+    });
 
     Ok(repositories)
 }
