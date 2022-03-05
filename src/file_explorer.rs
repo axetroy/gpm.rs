@@ -11,6 +11,7 @@ static OPEN_COMMAND: &str = "xdg-open";
 #[cfg(target_os = "windows")]
 static OPEN_COMMAND: &str = "explorer";
 
+// Open a path in file explorer
 pub fn open(folder: &Path) {
     ChildProcess::new(OPEN_COMMAND)
         .arg(folder.as_os_str().to_str().unwrap())
