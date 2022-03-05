@@ -159,7 +159,7 @@ fn main() {
 
             // if project exist
             if dest_dir.exists() {
-                let options: Vec<&str> = vec!["Auto", "Override", "Rename", "Cancel"];
+                let options: Vec<&str> = vec!["Auto", "Override", "Rename", "Open", "Cancel"];
 
                 let ans: Result<&str, InquireError> =
                     Select::new("The project exist, then you want: ", options).prompt();
@@ -196,6 +196,11 @@ fn main() {
                         }
 
                         new_dest_dir
+                    }
+                    Ok("Open") => {
+                        open_in_folder(&dest_dir);
+
+                        process::exit(0x0)
                     }
                     Ok(_) => process::exit(0x0),
                     Err(_) => process::exit(0x0),
