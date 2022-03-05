@@ -1,10 +1,10 @@
 #![deny(warnings)]
 mod find_path;
 mod open;
-use clap::{arg, Command};
+use clap::{arg, Arg, Command};
 use find_path::find_path;
 use git_url_parse::GitUrl;
-use inquire::{error::InquireError, Confirm, Select};
+use inquire::{error::InquireError, Confirm, Select, Text};
 use open::open as open_in_folder;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -51,7 +51,11 @@ fn main() {
             Command::new("clone")
                 .about("Clones repos")
                 .arg(arg!(<REMOTE> "The remote to clone"))
-                .arg(arg!([OPTIONS] "The options for git clone command"))
+                .arg(
+                    Arg::new("OPTIONS")
+                        .multiple_occurrences(true)
+                        .help("The git clone flags. eg. --progress --recursive"),
+                )
                 .arg_required_else_help(true),
         )
         .subcommand(
@@ -106,8 +110,8 @@ fn main() {
         Some(("clone", sub_matches)) => {
             let url = sub_matches.value_of("REMOTE").expect("required");
 
-            let clone_args = match sub_matches.value_of("OPTIONS") {
-                Some(s) => s.split(' ').collect::<Vec<&str>>(),
+            let clone_args = match sub_matches.values_of("OPTIONS") {
+                Some(s) => s.collect::<Vec<&str>>(),
                 _ => vec![],
             };
 
@@ -135,7 +139,51 @@ fn main() {
             dest_dir.push(repo_url.host.expect("invalid repository host"));
             dest_dir.push(repo_url.owner.expect("invalid repository owner"));
             dest_dir.push(repo_url.name);
-            dest_dir = find_path(dest_dir);
+
+            // if project exist
+            if dest_dir.exists() {
+                let options: Vec<&str> = vec!["Auto", "Override", "Rename"];
+
+                let ans: Result<&str, InquireError> =
+                    Select::new("The project exist, then you want: ", options).prompt();
+
+                dest_dir = match ans {
+                    Ok("Auto") => find_path(dest_dir),
+                    Ok("Override") => {
+                        let ans = Confirm::new("Override means that the original project will be deleted, are you sure you want to continue??")
+                            .with_default(false)
+                            .with_help_message(
+                                "[DANGER]: The data cannot be restored.",
+                            )
+                            .prompt();
+
+                        match ans {
+                            Ok(true) => fs::remove_dir_all(dest_dir.clone()).unwrap(),
+                            Ok(false) => process::exit(0x0),
+                            Err(_) => process::exit(0x0),
+                        };
+
+                        dest_dir
+                    }
+                    Ok("Rename") => {
+                        let mut new_dest_dir = dest_dir.clone();
+
+                        while new_dest_dir.exists() {
+                            let input = Text::new("Enter the new name:")
+                                .with_help_message("The project name is exists");
+
+                            new_dest_dir = match input.prompt() {
+                                Ok(name) => new_dest_dir.parent().unwrap().join(name),
+                                Err(_) => process::exit(0x0),
+                            }
+                        }
+
+                        new_dest_dir
+                    }
+                    Ok(_) => process::exit(0x0),
+                    Err(_) => process::exit(0x0),
+                }
+            }
 
             let dest_dir_will_be_removed = dest_dir.clone();
 
@@ -194,8 +242,8 @@ fn main() {
                                 match ans {
                                     Ok(true) => fs::create_dir(add_abs_root_path)
                                         .expect("can not create folder"),
-                                    Ok(false) => process::exit(0x00),
-                                    Err(_) => process::exit(0x00),
+                                    Ok(false) => process::exit(0x0),
+                                    Err(_) => process::exit(0x0),
                                 };
                             } else if !add_abs_root_path.is_dir() {
                                 panic!("The target filepath is not a folder.")
@@ -235,8 +283,8 @@ fn main() {
                                 match ans {
                                     Ok(true) => fs::create_dir(add_abs_root_path)
                                         .expect("can not create folder"),
-                                    Ok(false) => process::exit(0x00),
-                                    Err(_) => process::exit(0x00),
+                                    Ok(false) => process::exit(0x0),
+                                    Err(_) => process::exit(0x0),
                                 };
                             } else if !add_abs_root_path.is_dir() {
                                 panic!("The target filepath is not a folder.")

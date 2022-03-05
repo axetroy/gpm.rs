@@ -37,7 +37,7 @@ $ gpm config add root ~/gpm
 $ gpm clone https://github.com/axetroy/gpm.rs
 
 # clone with git options
-$ gpm clone https://github.com/axetroy/gpm.rs -- "--progress --recursive"
+$ gpm clone https://github.com/axetroy/gpm.rs -- --progress --recursive
 ```
 
 ## Relative
