@@ -21,7 +21,7 @@ pub fn url_to_path(root: &str, url: &str) -> Result<PathBuf, Report> {
             let owner = r.owner.expect("invalid repository owner");
 
             if host.is_empty() || owner.is_empty() {
-                return Err(Report::msg("url host is empty"));
+                return Err(Report::msg("url host or owner is empty"));
             }
 
             dir.push(root);
