@@ -65,21 +65,36 @@ fn main() {
                 .subcommand(
                     Command::new("add")
                         .about("Add configure for a field")
-                        .arg(arg!(<FIELD> "The field of configure"))
+                        .arg(
+                            Arg::new("FIELD")
+                                .possible_value("root")
+                                .required(true)
+                                .help("The field of configure"),
+                        )
                         .arg(arg!(<VALUE> "The value of the field"))
                         .arg_required_else_help(true),
                 )
                 .subcommand(
                     Command::new("set")
                         .about("Set configure for a field")
-                        .arg(arg!(<FIELD> "The field of configure"))
+                        .arg(
+                            Arg::new("FIELD")
+                                .possible_value("root")
+                                .required(true)
+                                .help("The field of configure"),
+                        )
                         .arg(arg!(<VALUE> "The value of the field"))
                         .arg_required_else_help(true),
                 )
                 .subcommand(
                     Command::new("remove")
                         .about("Remove configure for a field")
-                        .arg(arg!(<FIELD> "The field of configure"))
+                        .arg(
+                            Arg::new("FIELD")
+                                .possible_value("root")
+                                .required(true)
+                                .help("The field of configure"),
+                        )
                         .arg_required_else_help(true),
                 )
                 .subcommand(Command::new("reset").about("Reset configure")),
@@ -312,7 +327,12 @@ fn main() {
                 Some(("reset", _)) => {
                     rc.root = vec![];
                 }
-                _ => unreachable!(),
+                _ => {
+                    let serialized = serde_json::to_string(&rc).unwrap();
+
+                    println!("{}", serialized);
+                    process::exit(0x0);
+                }
             }
 
             let serialized = serde_json::to_string(&rc).unwrap();
