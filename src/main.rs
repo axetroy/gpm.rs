@@ -25,7 +25,7 @@ struct Preset {
 
 fn main() {
     let mut app = Command::new("gpm")
-        .version("v0.1.6")
+        .version("v0.1.7")
         .author("Axetroy <axetroy.dev@gmail.com>")
         .about("A command line tool, manage your hundreds of repository, written with Rust")
         .subcommand_required(true)
