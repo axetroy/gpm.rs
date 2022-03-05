@@ -116,7 +116,7 @@ fn main() {
             };
 
             let gpm_root: &str = if rc.root.is_empty() {
-                println!("Can not found root folder in the configure for clone. Try running the following command:\n\n    gpm config add root <folder>\n");
+                println!("Can not found root folder in the configure for clone.\nTry running the following command to add a default folder:\n\n    gpm config add root $HOME/gpm\n\nOr set to a custom folder:\n\n    gpm config add root <folder>\n");
                 process::exit(0x1);
             } else if rc.root.len() == 1 {
                 let s = &rc.root[0].as_str();
