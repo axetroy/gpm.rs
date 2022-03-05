@@ -150,4 +150,38 @@ mod tests {
 
         assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
     }
+
+    #[test]
+    fn test_url_to_path_with_gitlab() {
+        let url1 = "https://gitlab.com/axetroy/gpm.rs";
+
+        let r1 = git::url_to_path("../gpm", url1);
+
+        assert!(!r1.is_err());
+        assert!(r1.is_ok());
+
+        let p1 = r1.ok().unwrap();
+        let cwd = env::current_dir().unwrap();
+
+        #[cfg(target_family = "unix")]
+        let result1: &str = &(cwd
+            .parent()
+            .unwrap()
+            .as_os_str()
+            .to_str()
+            .unwrap()
+            .to_owned()
+            + &"/gpm/gitlab.com/axetroy/gpm.rs");
+        #[cfg(target_family = "windows")]
+        let result1: &str = &(cwd
+            .parent()
+            .unwrap()
+            .as_os_str()
+            .to_str()
+            .unwrap()
+            .to_owned()
+            + &"\\gpm\\gitlab.com\\axetroy\\gpm.rs");
+
+        assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
+    }
 }
