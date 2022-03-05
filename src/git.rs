@@ -56,7 +56,7 @@ pub fn clone(url: &str, dest: &Path, args: Vec<&str>) -> io::Result<bool> {
 #[cfg(test)]
 mod tests {
     use crate::git;
-    use std::env;
+    use std::{env, path::Path};
 
     #[test]
     fn test_url_to_path_when_empty() {
@@ -267,5 +267,20 @@ mod tests {
         );
 
         assert_eq!(p1.as_os_str().to_str().unwrap(), result1)
+    }
+
+    #[test]
+    fn test_clone() {
+        let url1 = "https://github.com/axetroy/gpm.rs.git";
+
+        let dest_dir = Path::new("./dist");
+
+        let r1 = git::clone(url1, dest_dir, vec![]);
+
+        assert!(!r1.is_err());
+        assert!(r1.is_ok());
+
+        assert!(r1.ok().unwrap());
+        assert!(dest_dir.exists());
     }
 }
