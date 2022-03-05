@@ -5,9 +5,15 @@
 ![License](https://img.shields.io/github/license/axetroy/gpm.rs.svg)
 ![Repo Size](https://img.shields.io/github/repo-size/axetroy/gpm.rs.svg)
 
-> If you have more than a dozen, even more project in your computer, how will you manage them? This is a problem!
+> If you have hundreds of repository, how will you manage them?
 
-This is what this tool is to be resolved. The directory is hierarchically based on the Git address, similar to Golang's package management, which can organize your hundreds or even thousands of projects.
+This tool helps you manage repository. The directory is hierarchically based on the Git address, similar to Golang's package management, which can organize your hundreds or even thousands of projects.
+
+eg. `https://github.com/axetroy/gpm.rs.git` will be storage at `$ROOT/github.com/axetroy/gpm.rs` just with one command:
+
+```bash
+$ gpm clone https://github.com/axetroy/gpm.rs.git
+```
 
 ### Install
 
