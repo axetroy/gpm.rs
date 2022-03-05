@@ -30,8 +30,8 @@ fn main() {
         .allow_invalid_utf8_for_external_subcommands(true)
         .subcommand(
             Command::new("clone")
-                .about("Clones repos")
-                .arg(arg!(<REMOTE> "The remote to clone"))
+                .about("Clones repository")
+                .arg(arg!(<REMOTE> "The remote Git URL to clone"))
                 .arg(
                     Arg::new("OPTIONS")
                         .required(false)
