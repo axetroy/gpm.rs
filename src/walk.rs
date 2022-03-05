@@ -30,6 +30,8 @@ pub fn walk_root(dir: &Path) -> io::Result<Vec<PathBuf>> {
         }
     }
 
+    repositories.sort();
+
     Ok(repositories)
 }
 
