@@ -142,7 +142,7 @@ fn main() {
 
             // if project exist
             if dest_dir.exists() {
-                let options: Vec<&str> = vec!["Auto", "Override", "Rename"];
+                let options: Vec<&str> = vec!["Auto", "Override", "Rename", "Cancel"];
 
                 let ans: Result<&str, InquireError> =
                     Select::new("The project exist, then you want: ", options).prompt();
