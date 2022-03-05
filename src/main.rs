@@ -114,11 +114,17 @@ fn main() {
 
     let matches = app.clone().get_matches();
 
-    fn get_gpm_root(rc: &Preset) -> &str {
+    fn check_gpm_root(rc: &Preset) {
         if rc.root.is_empty() {
-            println!("Can not found root folder in the configure for clone.\nTry running the following command to add a default folder:\n\n    gpm config add root $HOME/gpm\n\nOr set to a custom folder:\n\n    gpm config add root <folder>\n");
+            println!("Can not found root folder in the configure.\nTry running the following command to add a default folder:\n\n    gpm config add root $HOME/gpm\n\nOr set to a custom folder:\n\n    gpm config add root <folder>\n");
             process::exit(0x1);
-        } else if rc.root.len() == 1 {
+        }
+    }
+
+    fn get_gpm_root(rc: &Preset) -> &str {
+        check_gpm_root(rc);
+
+        if rc.root.len() == 1 {
             let s = &rc.root[0].as_str();
             s
         } else {
@@ -340,12 +346,15 @@ fn main() {
             fs::write(gpm_rc, serialized).expect("can not write to $HOME/.gpmrc");
         }
         Some(("list", _)) => {
-            let gpm_root: &str = get_gpm_root(&rc);
-            let root = Path::new(gpm_root);
-            let repositories = walk::walk_root(root).unwrap();
+            check_gpm_root(&rc);
 
-            for v in repositories {
-                println!("{}", v.as_os_str().to_str().unwrap())
+            for gpm_root in rc.root {
+                let root = Path::new(&gpm_root);
+                let repositories = walk::walk_root(root).unwrap();
+
+                for v in repositories {
+                    println!("{}", v.as_os_str().to_str().unwrap())
+                }
             }
         }
         Some(("open", sub_matches)) => {
