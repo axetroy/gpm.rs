@@ -1,9 +1,13 @@
 #![deny(warnings)]
+extern crate path_absolutize;
+
 mod file_explorer;
 mod git;
 mod util;
+
 use clap::{arg, Arg, Command};
 use inquire::{error::InquireError, Confirm, Select, Text};
+use path_absolutize::*;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
@@ -209,8 +213,7 @@ fn main() {
 
                     match field {
                         "root" => {
-                            let add_abs_root_path =
-                                &util::get_absolute_path(&Path::new(value)).unwrap();
+                            let add_abs_root_path = Path::new(value).absolutize().unwrap();
 
                             if !add_abs_root_path.exists() {
                                 let ans = Confirm::new(
@@ -227,7 +230,7 @@ fn main() {
                                 .prompt();
 
                                 match ans {
-                                    Ok(true) => fs::create_dir(add_abs_root_path)
+                                    Ok(true) => fs::create_dir(&add_abs_root_path)
                                         .expect("can not create folder"),
                                     Ok(false) => process::exit(0x0),
                                     Err(_) => process::exit(0x0),
@@ -236,10 +239,15 @@ fn main() {
                                 panic!("The target filepath is not a folder.")
                             }
 
-                            let new_roo_str = add_abs_root_path.to_str().unwrap().to_string();
+                            let new_roo_str = &add_abs_root_path
+                                .as_os_str()
+                                .to_os_string()
+                                .to_str()
+                                .unwrap()
+                                .to_string();
 
-                            if !rc.root.contains(&new_roo_str) {
-                                rc.root.push(new_roo_str);
+                            if !rc.root.contains(new_roo_str) {
+                                rc.root.push(new_roo_str.to_owned());
                             }
                         }
                         _ => panic!("unknown configure field '{}' for add", field),
@@ -251,8 +259,7 @@ fn main() {
 
                     match field {
                         "root" => {
-                            let add_abs_root_path =
-                                &util::get_absolute_path(&Path::new(value)).unwrap();
+                            let add_abs_root_path = Path::new(value).absolutize().unwrap();
 
                             if !add_abs_root_path.exists() {
                                 let ans = Confirm::new(
@@ -269,7 +276,7 @@ fn main() {
                                 .prompt();
 
                                 match ans {
-                                    Ok(true) => fs::create_dir(add_abs_root_path)
+                                    Ok(true) => fs::create_dir(&add_abs_root_path)
                                         .expect("can not create folder"),
                                     Ok(false) => process::exit(0x0),
                                     Err(_) => process::exit(0x0),
@@ -278,9 +285,14 @@ fn main() {
                                 panic!("The target filepath is not a folder.")
                             }
 
-                            let new_roo_str = add_abs_root_path.to_str().unwrap().to_string();
+                            let new_roo_str = &add_abs_root_path
+                                .as_os_str()
+                                .to_os_string()
+                                .to_str()
+                                .unwrap()
+                                .to_string();
 
-                            rc.root = vec![new_roo_str]
+                            rc.root = vec![new_roo_str.to_owned()]
                         }
                         _ => panic!("unknown configure field '{}' for set", field),
                     }
