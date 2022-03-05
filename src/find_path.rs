@@ -14,8 +14,9 @@ pub fn find_path(mut filepath: PathBuf) -> PathBuf {
     while filepath.exists() {
         let mut name = base_name.to_string();
 
-        name.push('-');
+        name.push('(');
         name.push_str(index.to_string().as_str());
+        name.push(')');
 
         filepath = filepath.parent().unwrap().join(name);
 
