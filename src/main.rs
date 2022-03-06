@@ -4,9 +4,9 @@ extern crate path_absolutize;
 mod file_explorer;
 mod git;
 mod util;
-mod walk;
+mod walker;
 
-use clap::{arg, Arg, Command};
+use clap::{arg, Arg, Command, PossibleValue};
 use inquire::{error::InquireError, Confirm, Select, Text};
 use path_absolutize::*;
 use serde::{Deserialize, Serialize};
@@ -24,6 +24,8 @@ struct Preset {
 }
 
 fn main() {
+    let config_field_root = PossibleValue::new("root").help("The root of clones repository");
+
     let mut app = Command::new("gpm")
         .version("v0.1.8")
         .author("Axetroy <axetroy.dev@gmail.com>")
@@ -44,7 +46,11 @@ fn main() {
                 )
                 .arg_required_else_help(true),
         )
-        .subcommand(Command::new("list").about("List cloned repositories"))
+        .subcommand(
+            Command::new("list")
+                .alias("ls")
+                .about("List cloned repositories"),
+        )
         .subcommand(
             Command::new("open")
                 .about("Open repository with file explorer")
@@ -60,7 +66,7 @@ fn main() {
                         .about("Add configure for a field")
                         .arg(
                             Arg::new("FIELD")
-                                .possible_value("root")
+                                .possible_value(config_field_root.to_owned())
                                 .required(true)
                                 .help("The field of configure"),
                         )
@@ -72,7 +78,7 @@ fn main() {
                         .about("Set configure for a field")
                         .arg(
                             Arg::new("FIELD")
-                                .possible_value("root")
+                                .possible_value(config_field_root.to_owned())
                                 .required(true)
                                 .help("The field of configure"),
                         )
@@ -84,7 +90,7 @@ fn main() {
                         .about("Remove configure for a field")
                         .arg(
                             Arg::new("FIELD")
-                                .possible_value("root")
+                                .possible_value(config_field_root)
                                 .required(true)
                                 .help("The field of configure"),
                         )
@@ -352,7 +358,7 @@ fn main() {
 
             for gpm_root in rc.root {
                 let root = Path::new(&gpm_root);
-                let repositories = walk::walk_root(root).unwrap();
+                let repositories = walker::walk_root(root).unwrap();
 
                 for v in repositories {
                     println!("{}", v.as_os_str().to_str().unwrap())

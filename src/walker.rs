@@ -45,13 +45,13 @@ pub fn walk_root(dir: &Path) -> io::Result<Vec<PathBuf>> {
 mod tests {
     use std::env;
 
-    use crate::walk;
+    use crate::walker;
 
     #[test]
     fn test_walk_root() {
         let test_gpm_root = env::current_dir().unwrap().join("__test__").join("gpm");
 
-        let r1 = walk::walk_root(&test_gpm_root);
+        let r1 = walker::walk_root(&test_gpm_root);
 
         assert!(!r1.is_err());
 
