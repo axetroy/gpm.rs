@@ -211,13 +211,11 @@ fn main() {
                 }
             }
 
-            let dest_dir_will_be_removed = dest_dir.clone();
+            let rm_dir = dest_dir.clone();
 
             // remove temp dir when cancel the action
             ctrlc::set_handler(move || {
-                if dest_dir_will_be_removed.exists() {
-                    fs::remove_dir_all(dest_dir_will_be_removed.as_path()).unwrap();
-                }
+                if rm_dir.exists() && fs::remove_dir_all(rm_dir.as_path()).is_ok() {}
             })
             .unwrap_or_else(|e| println!("Error setting Ctrl-C handler: {}", e));
 
