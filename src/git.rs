@@ -64,7 +64,6 @@ mod tests {
 
         let r1 = git::url_to_path("", url1);
 
-        assert!(!r1.is_err());
         assert!(r1.is_ok());
 
         let p1 = r1.ok().unwrap();
@@ -90,7 +89,6 @@ mod tests {
 
         let r1 = git::url_to_path("gpm", url1);
 
-        assert!(!r1.is_err());
         assert!(r1.is_ok());
 
         let p1 = r1.ok().unwrap();
@@ -116,7 +114,6 @@ mod tests {
 
         let r1 = git::url_to_path("./gpm", url1);
 
-        assert!(!r1.is_err());
         assert!(r1.is_ok());
 
         let p1 = r1.ok().unwrap();
@@ -142,7 +139,6 @@ mod tests {
 
         let r1 = git::url_to_path("../gpm", url1);
 
-        assert!(!r1.is_err());
         assert!(r1.is_ok());
 
         let p1 = r1.ok().unwrap();
@@ -178,7 +174,6 @@ mod tests {
 
         let r1 = git::url_to_path("../gpm", url1);
 
-        assert!(!r1.is_err());
         assert!(r1.is_ok());
 
         let p1 = r1.ok().unwrap();
@@ -214,7 +209,6 @@ mod tests {
 
         let r1 = git::url_to_path(".", url1);
 
-        assert!(!r1.is_err());
         assert!(r1.is_ok());
 
         let p1 = r1.ok().unwrap();
@@ -249,7 +243,6 @@ mod tests {
 
         let r1 = git::url_to_path(".", url1);
 
-        assert!(!r1.is_err());
         assert!(r1.is_ok());
 
         let p1 = r1.ok().unwrap();
@@ -277,7 +270,6 @@ mod tests {
 
         let r1 = git::clone(url1, dest_dir, vec![]);
 
-        assert!(!r1.is_err());
         assert!(r1.is_ok());
 
         assert!(r1.ok().unwrap());

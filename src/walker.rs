@@ -53,13 +53,13 @@ mod tests {
 
         let r1 = walker::walk_root(&test_gpm_root);
 
-        assert!(!r1.is_err());
+        assert!(r1.is_ok());
 
         let r1 = r1
             .ok()
             .unwrap()
             .into_iter()
-            .map(|s| s.clone().as_os_str().to_str().unwrap().to_owned())
+            .map(|s| s.as_os_str().to_str().unwrap().to_owned())
             .collect::<Vec<String>>();
 
         assert_eq!(
