@@ -237,7 +237,9 @@ fn main() {
 
                     match field {
                         "root" => {
-                            let add_abs_root_path = Path::new(value).absolutize().unwrap();
+                            let value_normal =
+                                &value.replace('/', &std::path::MAIN_SEPARATOR.to_string());
+                            let add_abs_root_path = Path::new(value_normal).absolutize().unwrap();
 
                             if !add_abs_root_path.exists() {
                                 let ans = Confirm::new(
@@ -284,7 +286,9 @@ fn main() {
 
                     match field {
                         "root" => {
-                            let add_abs_root_path = Path::new(value).absolutize().unwrap();
+                            let value_normal =
+                                &value.replace('/', &std::path::MAIN_SEPARATOR.to_string());
+                            let add_abs_root_path = Path::new(value_normal).absolutize().unwrap();
 
                             if !add_abs_root_path.exists() {
                                 let ans = Confirm::new(
