@@ -119,9 +119,9 @@ jobs:
           cargo build --release --locked --target x86_64-pc-windows-msvc
           cargo build --release --locked --target i686-pc-windows-msvc
           cargo build --release --locked --target aarch64-pc-windows-msvc
-          tar -cvzf target/x86_64-pc-windows-msvc/release/gpm_window_amd64.tar.gz --directory=target/x86_64-pc-windows-msvc/release gpm.exe
-          tar -cvzf target/i686-pc-windows-msvc/release/gpm_window_386.tar.gz --directory=target/i686-pc-windows-msvc/release gpm.exe
-          tar -cvzf target/aarch64-pc-windows-msvc/release/gpm_window_arm64.tar.gz --directory=target/aarch64-pc-windows-msvc/release gpm.exe
+          tar -cvzf target/x86_64-pc-windows-msvc/release/gpm_windows_amd64.tar.gz --directory=target/x86_64-pc-windows-msvc/release gpm.exe
+          tar -cvzf target/i686-pc-windows-msvc/release/gpm_windows_386.tar.gz --directory=target/i686-pc-windows-msvc/release gpm.exe
+          tar -cvzf target/aarch64-pc-windows-msvc/release/gpm_windows_arm64.tar.gz --directory=target/aarch64-pc-windows-msvc/release gpm.exe
 
       - name: Release
         uses: softprops/action-gh-release@v1
