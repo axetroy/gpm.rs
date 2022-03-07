@@ -6,10 +6,13 @@ run:
 	cargo run
 
 lint:
-	cargo clippy -- -D warnings
+	cargo clippy --tests -- -D warnings
 
 format-check:
 	cargo fmt --all -- --check
+
+check:
+	cargo check --locked
 
 format:
 	cargo fmt --all
