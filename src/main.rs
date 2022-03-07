@@ -1,6 +1,7 @@
 #![deny(warnings)]
 extern crate path_absolutize;
 
+mod configure;
 mod file_explorer;
 mod git;
 mod util;
@@ -8,20 +9,12 @@ mod walker;
 
 use clap::{arg, Arg, Command, PossibleValue};
 use inquire::{error::InquireError, Confirm, Select, Text};
-use path_absolutize::*;
-use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
-use std::io::Read;
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process;
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Preset {
-    root: Vec<String>,
-}
 
 fn main() {
     let config_field_root = PossibleValue::new("root").help("The root of clones repository");
@@ -99,9 +92,7 @@ fn main() {
                 .subcommand(Command::new("reset").about("Reset configure")),
         );
 
-    let home_dir = dirs::home_dir().unwrap();
-    let mut gpm_rc = home_dir;
-    gpm_rc.push(".gpmrc");
+    let gpm_rc = dirs::home_dir().unwrap().join(".gpmrc");
 
     let is_gpm_rc_exist = Path::new(gpm_rc.as_os_str()).exists();
 
@@ -112,24 +103,18 @@ fn main() {
         drop(file);
     }
 
-    let mut rc_file = File::open(gpm_rc.as_path()).unwrap();
-
-    let mut file_content = String::new();
-    rc_file.read_to_string(&mut file_content).unwrap();
-    drop(rc_file);
-
-    let mut rc: Preset = serde_json::from_str(&file_content).unwrap();
+    let mut rc = configure::new(&gpm_rc).expect("invalid configure file");
 
     let matches = app.clone().get_matches();
 
-    fn check_gpm_root(rc: &Preset) {
+    fn check_gpm_root(rc: &configure::Configure) {
         if rc.root.is_empty() {
             println!("Can not found root folder in the configure.\nTry running the following command to add a default folder:\n\n    gpm config add root $HOME/gpm\n\nOr set to a custom folder:\n\n    gpm config add root <folder>\n");
             process::exit(0x1);
         }
     }
 
-    fn get_gpm_root(rc: &Preset) -> &str {
+    fn get_gpm_root(rc: &configure::Configure) -> &str {
         check_gpm_root(rc);
 
         if rc.root.len() == 1 {
@@ -229,132 +214,30 @@ fn main() {
                 }
             }
         }
-        Some(("config", sub_matches)) => {
-            match sub_matches.subcommand() {
-                Some(("add", sub_matches)) => {
-                    let field = sub_matches.value_of("FIELD").expect("required");
-                    let value = sub_matches.value_of("VALUE").expect("required");
+        Some(("config", sub_matches)) => match sub_matches.subcommand() {
+            Some(("add", sub_matches)) => {
+                let field = sub_matches.value_of("FIELD").expect("required");
+                let value = sub_matches.value_of("VALUE").expect("required");
 
-                    match field {
-                        "root" => {
-                            let value_normal =
-                                &value.replace('/', &std::path::MAIN_SEPARATOR.to_string());
-                            let add_abs_root_path = Path::new(value_normal).absolutize().unwrap();
-
-                            if !add_abs_root_path.exists() {
-                                let ans = Confirm::new(
-                                    "The target folder not exist, do you want to create?",
-                                )
-                                .with_default(false)
-                                .with_help_message(
-                                    add_abs_root_path
-                                        .as_os_str()
-                                        .to_os_string()
-                                        .to_str()
-                                        .unwrap(),
-                                )
-                                .prompt();
-
-                                match ans {
-                                    Ok(true) => fs::create_dir(&add_abs_root_path)
-                                        .expect("can not create folder"),
-                                    Ok(false) => process::exit(0x0),
-                                    Err(_) => process::exit(0x0),
-                                };
-                            } else if !add_abs_root_path.is_dir() {
-                                panic!("The target filepath is not a folder.")
-                            }
-
-                            let new_roo_str = &add_abs_root_path
-                                .as_os_str()
-                                .to_os_string()
-                                .to_str()
-                                .unwrap()
-                                .to_string();
-
-                            if !rc.root.contains(new_roo_str) {
-                                println!("Added '{}' to root of configure.", new_roo_str);
-                                rc.root.push(new_roo_str.to_owned());
-                            }
-                        }
-                        _ => panic!("unknown configure field '{}' for add", field),
-                    }
-                }
-                Some(("set", sub_matches)) => {
-                    let field = sub_matches.value_of("FIELD").expect("required");
-                    let value = sub_matches.value_of("VALUE").expect("required");
-
-                    match field {
-                        "root" => {
-                            let value_normal =
-                                &value.replace('/', &std::path::MAIN_SEPARATOR.to_string());
-                            let add_abs_root_path = Path::new(value_normal).absolutize().unwrap();
-
-                            if !add_abs_root_path.exists() {
-                                let ans = Confirm::new(
-                                    "The target folder not exist, do you want to create?",
-                                )
-                                .with_default(false)
-                                .with_help_message(
-                                    add_abs_root_path
-                                        .as_os_str()
-                                        .to_os_string()
-                                        .to_str()
-                                        .unwrap(),
-                                )
-                                .prompt();
-
-                                match ans {
-                                    Ok(true) => fs::create_dir(&add_abs_root_path)
-                                        .expect("can not create folder"),
-                                    Ok(false) => process::exit(0x0),
-                                    Err(_) => process::exit(0x0),
-                                };
-                            } else if !add_abs_root_path.is_dir() {
-                                panic!("The target filepath is not a folder.")
-                            }
-
-                            let new_roo_str = &add_abs_root_path
-                                .as_os_str()
-                                .to_os_string()
-                                .to_str()
-                                .unwrap()
-                                .to_string();
-
-                            println!("Set '[{}]' to root of configure.", new_roo_str);
-
-                            rc.root = vec![new_roo_str.to_owned()]
-                        }
-                        _ => panic!("unknown configure field '{}' for set", field),
-                    }
-                }
-                Some(("remove", _)) => {
-                    let field = sub_matches.value_of("FIELD").expect("required");
-
-                    match field {
-                        "root" => {
-                            println!("Remove root of configure.");
-                            rc.root = vec![];
-                        }
-                        _ => panic!("unknown configure field '{}' for remove", field),
-                    }
-                }
-                Some(("reset", _)) => {
-                    println!("Reset configure.");
-                    rc.root = vec![];
-                }
-                _ => {
-                    let serialized = serde_json::to_string(&rc).unwrap();
-
-                    println!("{}", serialized);
-                    process::exit(0x0);
-                }
+                rc.add_field(field, value).unwrap();
             }
-
-            let serialized = serde_json::to_string(&rc).unwrap();
-
-            fs::write(gpm_rc, serialized).expect("can not write to $HOME/.gpmrc");
-        }
+            Some(("set", sub_matches)) => {
+                let field = sub_matches.value_of("FIELD").expect("required");
+                let value = sub_matches.value_of("VALUE").expect("required");
+                rc.set_field(field, value).unwrap();
+            }
+            Some(("remove", _)) => {
+                let field = sub_matches.value_of("FIELD").expect("required");
+                rc.remove_field(field).unwrap();
+            }
+            Some(("reset", _)) => {
+                rc.reset().unwrap();
+            }
+            _ => {
+                println!("{}", rc);
+                process::exit(0x0);
+            }
+        },
         Some(("list", _)) => {
             check_gpm_root(&rc);
 
