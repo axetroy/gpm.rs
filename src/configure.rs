@@ -285,7 +285,7 @@ mod tests {
 
             assert_eq!(
                 format!("{}", config),
-                format!(r#"{{"root":["{}"]}}"#, target_dir)
+                format!(r#"{{"root":["{}"]}}"#, target_dir.replace("\\", "\\\\"))
             );
 
             config.reset().unwrap();
