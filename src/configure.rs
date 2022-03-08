@@ -59,31 +59,38 @@ impl Configure {
         Ok(())
     }
 
-    pub fn add_field(&mut self, field: &str, value: &str) -> Result<(), Report> {
+    pub fn add_field(&mut self, field: &str, value: &str, skip_qa: bool) -> Result<(), Report> {
         let result = match field {
             "root" => {
                 let value_normal = &value.replace('/', &std::path::MAIN_SEPARATOR.to_string());
                 let add_abs_root_path = Path::new(value_normal).absolutize().unwrap();
 
                 if !add_abs_root_path.exists() {
-                    let ans = Confirm::new("The target folder not exist, do you want to create?")
-                        .with_default(false)
-                        .with_help_message(
-                            add_abs_root_path
-                                .as_os_str()
-                                .to_os_string()
-                                .to_str()
-                                .unwrap(),
-                        )
-                        .prompt();
+                    if !skip_qa {
+                        let help_message = format!(
+                            "The target folder '{}' not exist, do you want to create?",
+                            &add_abs_root_path.display()
+                        );
 
-                    match ans {
-                        Ok(true) => {
-                            fs::create_dir(&add_abs_root_path).expect("can not create folder")
-                        }
-                        Ok(false) => process::exit(0x0),
-                        Err(_) => process::exit(0x0),
-                    };
+                        let ans = Confirm::new(&help_message)
+                            .with_default(false)
+                            .with_help_message(
+                                add_abs_root_path
+                                    .as_os_str()
+                                    .to_os_string()
+                                    .to_str()
+                                    .unwrap(),
+                            )
+                            .prompt();
+
+                        match ans {
+                            Ok(true) => {
+                                fs::create_dir(&add_abs_root_path).expect("can not create folder")
+                            }
+                            Ok(false) => process::exit(0x0),
+                            Err(_) => process::exit(0x0),
+                        };
+                    }
                 } else if !add_abs_root_path.is_dir() {
                     panic!("The target filepath is not a folder.")
                 }
@@ -115,31 +122,38 @@ impl Configure {
         }
     }
 
-    pub fn set_field(&mut self, field: &str, value: &str) -> Result<(), Report> {
+    pub fn set_field(&mut self, field: &str, value: &str, skip_qa: bool) -> Result<(), Report> {
         let result = match field {
             "root" => {
                 let value_normal = &value.replace('/', &std::path::MAIN_SEPARATOR.to_string());
                 let add_abs_root_path = Path::new(value_normal).absolutize().unwrap();
 
                 if !add_abs_root_path.exists() {
-                    let ans = Confirm::new("The target folder not exist, do you want to create?")
-                        .with_default(false)
-                        .with_help_message(
-                            add_abs_root_path
-                                .as_os_str()
-                                .to_os_string()
-                                .to_str()
-                                .unwrap(),
-                        )
-                        .prompt();
+                    if !skip_qa {
+                        let help_message = format!(
+                            "The target folder '{}' not exist, do you want to create?",
+                            &add_abs_root_path.display()
+                        );
 
-                    match ans {
-                        Ok(true) => {
-                            fs::create_dir(&add_abs_root_path).expect("can not create folder")
-                        }
-                        Ok(false) => process::exit(0x0),
-                        Err(_) => process::exit(0x0),
-                    };
+                        let ans = Confirm::new(&help_message)
+                            .with_default(false)
+                            .with_help_message(
+                                add_abs_root_path
+                                    .as_os_str()
+                                    .to_os_string()
+                                    .to_str()
+                                    .unwrap(),
+                            )
+                            .prompt();
+
+                        match ans {
+                            Ok(true) => {
+                                fs::create_dir(&add_abs_root_path).expect("can not create folder")
+                            }
+                            Ok(false) => process::exit(0x0),
+                            Err(_) => process::exit(0x0),
+                        };
+                    }
                 } else if !add_abs_root_path.is_dir() {
                     panic!("The target filepath is not a folder.")
                 }
@@ -264,14 +278,15 @@ mod tests {
 
         assert_eq!(config.root, Vec::<String>::new());
 
+        // add unknown field
         {
-            let r1 = config.add_field("field", "value");
+            let r1 = config.add_field("field", "value", false);
 
             assert!(r1.is_err());
         }
 
         {
-            let r1 = config.add_field("root", "./src");
+            let r1 = config.add_field("root", "./src", false);
 
             assert!(r1.is_ok());
 
@@ -288,9 +303,109 @@ mod tests {
                 format!(r#"{{"root":["{}"]}}"#, target_dir.replace('\\', "\\\\"))
             );
 
+            // restore config
             config.reset().unwrap();
+        }
+    }
 
-            assert_eq!(format!("{}", config), "{\"root\":[]}");
+    #[test]
+    fn test_configure_set_field() {
+        let gpm_rc = env::current_dir()
+            .unwrap()
+            .join("__test__")
+            .join("config")
+            .join(".gpmrc-set.json");
+
+        let rc = configure::new(&gpm_rc);
+
+        assert!(rc.is_ok());
+
+        let mut config = rc.unwrap();
+
+        assert_eq!(config.root, vec!["/path/to/a/dir/a", "/path/to/a/dir/b"]);
+
+        {
+            let r1 = config.set_field("root", "./src", false);
+
+            assert!(r1.is_ok());
+
+            let cwd = env::current_dir().unwrap();
+
+            let target_dir = cwd.join("src").as_os_str().to_str().unwrap().to_string();
+
+            let root = vec![target_dir.clone()];
+
+            assert_eq!(config.root, root);
+
+            assert_eq!(
+                format!("{}", config),
+                format!(r#"{{"root":["{}"]}}"#, target_dir.replace('\\', "\\\\"))
+            );
+
+            // restore config
+            config.reset().unwrap();
+            config.set_field("root", "/path/to/a/dir/a", true).unwrap();
+            config.add_field("root", "/path/to/a/dir/b", true).unwrap();
+        }
+    }
+
+    #[test]
+    fn test_configure_remove_field() {
+        let gpm_rc = env::current_dir()
+            .unwrap()
+            .join("__test__")
+            .join("config")
+            .join(".gpmrc-remove.json");
+
+        let rc = configure::new(&gpm_rc);
+
+        assert!(rc.is_ok());
+
+        let mut config = rc.unwrap();
+
+        assert_eq!(config.root, vec!["/path/to/a/dir/a", "/path/to/a/dir/b"]);
+
+        {
+            let r1 = config.remove_field("root");
+
+            assert!(r1.is_ok());
+
+            assert_eq!(config.root, Vec::<String>::new());
+
+            // restore config
+            config.reset().unwrap();
+            config.set_field("root", "/path/to/a/dir/a", true).unwrap();
+            config.add_field("root", "/path/to/a/dir/b", true).unwrap();
+        }
+    }
+
+    #[test]
+    fn test_configure_reset_field() {
+        let gpm_rc = env::current_dir()
+            .unwrap()
+            .join("__test__")
+            .join("config")
+            .join(".gpmrc-reset.json");
+
+        let rc = configure::new(&gpm_rc);
+
+        assert!(rc.is_ok());
+
+        let mut config = rc.unwrap();
+
+        assert_eq!(config.root, vec!["/path/to/a/dir/a", "/path/to/a/dir/b"]);
+
+        {
+            let r1 = config.reset();
+
+            assert!(r1.is_ok());
+
+            assert_eq!(config.root, Vec::<String>::new());
+
+            // restore config
+            config.reset().unwrap();
+            config.set_field("root", "/path/to/a/dir/a", true).unwrap();
+            config.add_field("root", "/path/to/a/dir/b", true).unwrap();
         }
     }
 }

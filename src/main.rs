@@ -237,12 +237,12 @@ fn main() {
                 let field = sub_matches.value_of("FIELD").expect("required");
                 let value = sub_matches.value_of("VALUE").expect("required");
 
-                rc.add_field(field, value).unwrap();
+                rc.add_field(field, value, false).unwrap();
             }
             Some(("set", sub_matches)) => {
                 let field = sub_matches.value_of("FIELD").expect("required");
                 let value = sub_matches.value_of("VALUE").expect("required");
-                rc.set_field(field, value).unwrap();
+                rc.set_field(field, value, false).unwrap();
             }
             Some(("remove", _)) => {
                 let field = sub_matches.value_of("FIELD").expect("required");
