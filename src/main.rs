@@ -9,6 +9,7 @@ mod walker;
 
 use clap::{arg, Arg, Command, PossibleValue};
 use inquire::{error::InquireError, Confirm, Select, Text};
+use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
@@ -42,6 +43,13 @@ fn main() {
         .subcommand(
             Command::new("list")
                 .alias("ls")
+                .arg(
+                    Arg::new("json")
+                        .short('j')
+                        .long("json")
+                        .help("Print output as JSON format")
+                        .takes_value(false),
+                )
                 .about("List cloned repositories"),
         )
         .subcommand(
@@ -238,15 +246,36 @@ fn main() {
                 process::exit(0x0);
             }
         },
-        Some(("list", _)) => {
+        Some(("list", sub_matches)) => {
             check_gpm_root(&rc);
+            let is_output_as_json = sub_matches.is_present("json");
 
-            for gpm_root in rc.root {
-                let root = Path::new(&gpm_root);
-                let repositories = walker::walk_root(root).unwrap();
+            if is_output_as_json {
+                let mut repository_map: HashMap<String, Vec<String>> = HashMap::new();
 
-                for v in repositories {
-                    println!("{}", v.as_os_str().to_str().unwrap())
+                for gpm_root in rc.root {
+                    let root = Path::new(&gpm_root);
+
+                    let repositories = walker::walk_root(root)
+                        .unwrap()
+                        .into_iter()
+                        .map(|v| v.as_os_str().to_str().unwrap().to_string())
+                        .collect::<Vec<String>>();
+
+                    repository_map.insert(gpm_root.clone(), repositories);
+                }
+
+                let serialized = serde_json::to_string(&repository_map).unwrap();
+
+                println!("{}", serialized)
+            } else {
+                for gpm_root in rc.root {
+                    let root = Path::new(&gpm_root);
+                    let repositories = walker::walk_root(root).unwrap();
+
+                    for v in repositories {
+                        println!("{}", v.as_os_str().to_str().unwrap())
+                    }
                 }
             }
         }
