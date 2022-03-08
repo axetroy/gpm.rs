@@ -209,8 +209,7 @@ fn main() {
 
                         process::exit(0x0)
                     }
-                    Ok(_) => process::exit(0x0),
-                    Err(_) => process::exit(0x0),
+                    _ => process::exit(0x0),
                 }
             }
 
@@ -223,7 +222,7 @@ fn main() {
             .unwrap_or_else(|e| println!("Error setting Ctrl-C handler: {}", e));
 
             match git::clone(url, &dest_dir, clone_args) {
-                Ok(true) => file_explorer::open(&dest_dir),
+                Ok(()) => file_explorer::open(&dest_dir),
                 _ => {
                     if dest_dir.exists() {
                         fs::remove_dir_all(dest_dir).unwrap();

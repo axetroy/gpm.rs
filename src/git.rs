@@ -6,7 +6,6 @@ use core::result::Result;
 use eyre::Report;
 use git_url_parse::GitUrl;
 use path_absolutize::*;
-use std::io;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command as ChildProcess;
@@ -37,7 +36,7 @@ pub fn url_to_path(root: &str, url: &str) -> Result<PathBuf, Report> {
     }
 }
 
-pub fn clone(url: &str, dest: &Path, args: Vec<&str>) -> io::Result<bool> {
+pub fn clone(url: &str, dest: &Path, args: Vec<&str>) -> Result<(), Report> {
     match ChildProcess::new("git")
         .arg("clone")
         .arg(url)
@@ -46,10 +45,16 @@ pub fn clone(url: &str, dest: &Path, args: Vec<&str>) -> io::Result<bool> {
         .spawn()
     {
         Ok(mut child) => match child.wait() {
-            Ok(state) => Ok(state.success()),
-            Err(e) => Err(e),
+            Ok(state) => {
+                if state.success() {
+                    Ok(())
+                } else {
+                    Err(Report::msg("git clone process fail"))
+                }
+            }
+            Err(e) => Err(Report::from(e)),
         },
-        Err(e) => Err(e),
+        Err(e) => Err(Report::from(e)),
     }
 }
 
@@ -271,8 +276,6 @@ mod tests {
         let r1 = git::clone(url1, dest_dir, vec![]);
 
         assert!(r1.is_ok());
-
-        assert!(r1.ok().unwrap());
         assert!(dest_dir.exists());
 
         fs::remove_dir_all(dest_dir).unwrap();
