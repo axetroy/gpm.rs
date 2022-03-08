@@ -284,7 +284,7 @@ mod tests {
             assert_eq!(config.root, root);
 
             assert_eq!(
-                format!(r#"{}"#, config),
+                format!("{}", config),
                 format!(r#"{{"root":["{}"]}}"#, target_dir)
             );
 
