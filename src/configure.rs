@@ -234,4 +234,17 @@ mod tests {
 
         assert!(rc.is_err());
     }
+
+    #[test]
+    fn test_configure_empty_content_file() {
+        let gpm_rc = env::current_dir()
+            .unwrap()
+            .join("__test__")
+            .join("config")
+            .join(".gpmrc-empty.json");
+
+        let rc = configure::new(&gpm_rc);
+
+        assert!(rc.is_err());
+    }
 }
