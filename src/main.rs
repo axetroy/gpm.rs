@@ -21,7 +21,7 @@ fn main() {
     let config_field_root = PossibleValue::new("root").help("The root of clones repository");
 
     let mut app = Command::new("gpm")
-        .version("v0.1.10")
+        .version("v0.1.11")
         .author("Axetroy <axetroy.dev@gmail.com>")
         .about("A command line tool, manage your hundreds of repository, written with Rust")
         .subcommand_required(true)
