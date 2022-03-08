@@ -247,4 +247,50 @@ mod tests {
 
         assert!(rc.is_err());
     }
+
+    #[test]
+    fn test_configure_add_field() {
+        let gpm_rc = env::current_dir()
+            .unwrap()
+            .join("__test__")
+            .join("config")
+            .join(".gpmrc-add.json");
+
+        let rc = configure::new(&gpm_rc);
+
+        assert!(rc.is_ok());
+
+        let mut config = rc.unwrap();
+
+        assert_eq!(config.root, Vec::<String>::new());
+
+        {
+            let r1 = config.add_field("field", "value");
+
+            assert!(r1.is_err());
+        }
+
+        {
+            let r1 = config.add_field("root", "./src");
+
+            assert!(r1.is_ok());
+
+            let cwd = env::current_dir().unwrap();
+
+            let target_dir = cwd.join("src").as_os_str().to_str().unwrap().to_string();
+
+            let root = vec![target_dir.clone()];
+
+            assert_eq!(config.root, root);
+
+            assert_eq!(
+                format!(r#"{}"#, config),
+                format!(r#"{{"root":["{}"]}}"#, target_dir)
+            );
+
+            config.reset().unwrap();
+
+            assert_eq!(format!("{}", config), "{\"root\":[]}");
+        }
+    }
 }
