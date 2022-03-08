@@ -282,9 +282,10 @@ fn main() {
                 for gpm_root in rc.root {
                     let root = Path::new(&gpm_root);
                     let repositories = walker::walk_root(root).unwrap();
+                    println!("{}", gpm_root);
 
                     for v in repositories {
-                        println!("{}", v.as_os_str().to_str().unwrap())
+                        println!("    {}", v.as_os_str().to_str().unwrap())
                     }
                 }
             }
