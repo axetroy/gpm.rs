@@ -56,7 +56,7 @@ pub fn clone(url: &str, dest: &Path, args: Vec<&str>) -> io::Result<bool> {
 #[cfg(test)]
 mod tests {
     use crate::git;
-    use std::{env, path::Path, fs};
+    use std::{env, fs, path::Path};
 
     #[test]
     fn test_url_to_path_when_empty() {
