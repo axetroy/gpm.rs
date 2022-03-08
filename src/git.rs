@@ -56,7 +56,7 @@ pub fn clone(url: &str, dest: &Path, args: Vec<&str>) -> io::Result<bool> {
 #[cfg(test)]
 mod tests {
     use crate::git;
-    use std::{env, path::Path};
+    use std::{env, path::Path, fs};
 
     #[test]
     fn test_url_to_path_when_empty() {
@@ -274,5 +274,7 @@ mod tests {
 
         assert!(r1.ok().unwrap());
         assert!(dest_dir.exists());
+
+        fs::remove_dir_all(dest_dir).unwrap();
     }
 }
