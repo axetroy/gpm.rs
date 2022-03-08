@@ -183,8 +183,18 @@ fn main() {
                         let mut new_dest_dir = dest_dir.clone();
 
                         while new_dest_dir.exists() {
-                            let input = Text::new("Enter the new name:")
-                                .with_help_message("The project name is exists");
+                            let dir_name = new_dest_dir
+                                .file_name()
+                                .unwrap()
+                                .to_str()
+                                .unwrap()
+                                .to_string();
+
+                            let help_msg =
+                                format!("The project name '{}' already exists.", &dir_name);
+
+                            let input =
+                                Text::new("Enter the new name:").with_help_message(&help_msg);
 
                             new_dest_dir = match input.prompt() {
                                 Ok(name) => new_dest_dir.parent().unwrap().join(name),
