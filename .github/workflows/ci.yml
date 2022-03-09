@@ -126,9 +126,7 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: |
-          startsWith(github.repository, 'axetroy') &&
-          startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.repository, 'axetroy') && startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.GT_TOKEN }}
         with:
@@ -147,3 +145,63 @@ jobs:
             target/x86_64-apple-darwin/release/gpm_darwin_amd64.tar.gz
             target/aarch64-apple-darwin/release/gpm_darwin_arm64.tar.gz
           draft: false
+
+      - name: Clone axetroy/homebrew-gpm.rs
+        if: startsWith(matrix.os, 'macOS') && startsWith(github.repository, 'axetroy') && startsWith(github.ref, 'refs/tags/')
+        uses: actions/checkout@v3
+        with:
+          repository: "axetroy/homebrew-gpm.rs"
+          token: ${{ secrets.GT_TOKEN }}
+
+      - uses: actions/setup-node@v2
+        if: startsWith(matrix.os, 'macOS') && startsWith(github.repository, 'axetroy') && startsWith(github.ref, 'refs/tags/')
+        with:
+          node-version: "14"
+
+      - name: Update homebrew Formula
+        if: startsWith(matrix.os, 'macOS') && startsWith(github.repository, 'axetroy') && startsWith(github.ref, 'refs/tags/')
+        env:
+          GIT_REF: ${{ github.ref }}
+          FORMULA_DIR: homebrew-gpm.rs
+        run: node ./script/update_homebrew_formula.js
+
+      - name: Publish to homebrew
+        if: startsWith(matrix.os, 'macOS') && startsWith(github.repository, 'axetroy') && startsWith(github.ref, 'refs/tags/')
+        uses: EndBug/add-and-commit@v8 # You can change this to use a specific version.
+        with:
+          # The arguments for the `git add` command (see the paragraph below for more info)
+          # Default: '.'
+          add: "Formula"
+
+          # The name of the user that will be displayed as the author of the commit.
+          # Default: depends on the default_author input
+          author_name: Axetroy
+
+          # The email of the user that will be displayed as the author of the commit.
+          # Default: depends on the default_author input
+          author_email: axetroy.dev@gmail.com
+
+          # The name of the custom committer you want to use, if different from the author of the commit.
+          # Default: the name of the author (set with either author_name or default_author)
+          committer_name: Axetroy
+
+          # The email of the custom committer you want to use, if different from the author of the commit.
+          # Default: the email of the author (set with either author_email or default_author)
+          committer_email: axetroy.dev@gmail.com
+
+          # The local path to the directory where your repository is located. You should use actions/checkout first to set it up.
+          # Default: '.'
+          cwd: "./homebrew-gpm.rs"
+
+          # Determines the way the action fills missing author name and email. Three options are available:
+          # - github_actor -> UserName <UserName@users.noreply.github.com>
+          # - user_info -> Your Display Name <your-actual@email.com>
+          # - github_actions -> github-actions <email associated with the github logo>
+          # Default: github_actor
+          default_author: github_actor
+
+          # The message for the commit.
+          # Default: 'Commit from GitHub Actions (name of the workflow)'
+          message: "Your commit message"
+
+          push: true
