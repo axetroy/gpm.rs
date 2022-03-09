@@ -1,7 +1,5 @@
 #![deny(warnings)]
 
-extern crate path_absolutize;
-
 use core::result::Result;
 use eyre::Report;
 use git_url_parse::GitUrl;

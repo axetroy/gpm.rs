@@ -1,5 +1,4 @@
 #![deny(warnings)]
-extern crate path_absolutize;
 
 mod configure;
 mod file_explorer;
