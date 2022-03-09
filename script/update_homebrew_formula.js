@@ -2,10 +2,10 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 
-const inputRef = process.env.GIT_REF;
+const gitRef = process.env.GIT_REF;
 let formulaRepoDir = process.env.FORMULA_REPO_DIR;
 
-if (!inputRef) {
+if (!gitRef) {
   throw new Error("env 'GIT_REF' required");
 }
 
@@ -17,13 +17,13 @@ if (!path.isAbsolute(formulaRepoDir)) {
   formulaRepoDir = path.join(process.cwd(), formulaRepoDir);
 }
 
-const version = inputRef.replace(/^refs\/tags\/v?/, "");
+const version = gitRef.replace(/^refs\/tags\/v?/, "");
 
 const rbFile = path.join(formulaRepoDir, "Formula", "gpm.rs.rb");
 
-const formulaContent = fs.readFileSync(rbFile, { encoding: "utf-8" });
+let formulaContent = fs.readFileSync(rbFile, { encoding: "utf-8" });
 
-let newContent = formulaContent.replace(
+formulaContent = formulaContent.replace(
   /version\s"[\w\.]+"/g,
   `version "${version}"`
 );
@@ -40,6 +40,9 @@ hashSum.update(fileBuffer);
 
 const sha256 = hashSum.digest("hex");
 
-newContent = formulaContent.replace(/sha256\s"[\w]+"/g, `sha256 "${sha256}"`);
+formulaContent = formulaContent.replace(
+  /sha256\s"[\w]+"/g,
+  `sha256 "${sha256}"`
+);
 
-fs.writeFileSync(rbFile, newContent, { encoding: "utf-8" });
+fs.writeFileSync(rbFile, formulaContent, { encoding: "utf-8" });
