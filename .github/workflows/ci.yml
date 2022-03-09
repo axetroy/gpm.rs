@@ -162,7 +162,7 @@ jobs:
         env:
           GIT_REF: ${{ github.ref }}
           FORMULA_DIR: homebrew-gpm.rs
-        run: ls -lh && node ./script/update_homebrew_formula.js
+        run: ls -lh && node ../script/update_homebrew_formula.js
 
       - name: Release to homebrew tap
         if: startsWith(matrix.os, 'macOS') && startsWith(github.repository, 'axetroy') && startsWith(github.ref, 'refs/tags/')
@@ -189,7 +189,7 @@ jobs:
           committer_email: axetroy.dev@gmail.com
 
           # Default: '.'
-          cwd: "./homebrew-gpm.rs"
+          cwd: "."
 
           # Determines the way the action fills missing author name and email. Three options are available:
           # - github_actor -> UserName <UserName@users.noreply.github.com>
