@@ -151,12 +151,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: "axetroy/homebrew-gpm.rs"
-          token: ${{ secrets.GT_TOKEN }}
 
       - uses: actions/setup-node@v2
         if: startsWith(matrix.os, 'macOS') && startsWith(github.repository, 'axetroy') && startsWith(github.ref, 'refs/tags/')
         with:
-          node-version: "14"
+          node-version: "16"
 
       - name: Update homebrew Formula
         if: startsWith(matrix.os, 'macOS') && startsWith(github.repository, 'axetroy') && startsWith(github.ref, 'refs/tags/')
@@ -189,7 +188,6 @@ jobs:
           # Default: the email of the author (set with either author_email or default_author)
           committer_email: axetroy.dev@gmail.com
 
-          # The local path to the directory where your repository is located. You should use actions/checkout first to set it up.
           # Default: '.'
           cwd: "./homebrew-gpm.rs"
 
