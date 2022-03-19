@@ -17,26 +17,13 @@ $ gpm clone https://github.com/axetroy/gpm.rs.git
 
 ### Install
 
-1. Homebrew
+1. [Cask](https://github.com/axetroy/cask.rs)
 
    ```bash
-   brew tap axetroy/gpm.rs
-   brew install gpm.rs
+   cask install github.com/axetroy/gpm.rs
    ```
 
-2. Shell (Mac/Linux)
-
-   ```bash
-   curl -fsSL https://github.com/release-lab/install/raw/v1/install.sh | bash -s -- -r=axetroy/gpm.rs -e=gpm
-   ```
-
-3. PowerShell (Windows):
-
-   ```powershell
-   $r="axetroy/gpm.rs";$e="gpm";iwr https://github.com/release-lab/install/raw/v1/install.ps1 -useb | iex
-   ```
-
-4. [Github release page](https://github.com/axetroy/gpm.rs/releases)
+2. [Github release page](https://github.com/axetroy/gpm.rs/releases)
 
    Download the executable, then put it in the `$PATH` directory.
 
