@@ -17,6 +17,7 @@ use std::path::PathBuf;
 use std::process;
 
 fn main() {
+    let version = format!("v{}", env!("CARGO_PKG_VERSION"));
     let config_field_root = PossibleValue::new("root").help("The root of clones repository");
 
     let mut app = Command::new("gpm")
