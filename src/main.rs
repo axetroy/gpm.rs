@@ -20,9 +20,9 @@ fn main() {
     let config_field_root = PossibleValue::new("root").help("The root of clones repository");
 
     let mut app = Command::new("gpm")
-        .version("v0.1.12")
-        .author("Axetroy <axetroy.dev@gmail.com>")
-        .about("A command line tool, manage your hundreds of repository, written with Rust")
+        .version(version.as_str())
+        .about(env!("CARGO_PKG_DESCRIPTION"))
+        .author(env!("CARGO_PKG_AUTHORS"))
         .subcommand_required(true)
         .arg_required_else_help(true)
         .allow_external_subcommands(true)
