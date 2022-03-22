@@ -8,6 +8,8 @@ use std::process::Command as ChildProcess;
 static OPEN_COMMAND: &str = "open";
 #[cfg(target_os = "linux")]
 static OPEN_COMMAND: &str = "xdg-open";
+#[cfg(target_os = "freebsd")]
+static OPEN_COMMAND: &str = "xdg-open";
 #[cfg(target_os = "windows")]
 static OPEN_COMMAND: &str = "explorer";
 
