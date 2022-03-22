@@ -1,0 +1,193 @@
+name: build
+
+on:
+  push:
+    paths:
+      - "**/*.rs"
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+      - ".github/workflows/build.yml"
+  pull_request:
+    paths:
+      - "**/*.rs"
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+      - ".github/workflows/build.yml"
+  workflow_dispatch:
+
+jobs:
+  binaries:
+    name: ${{ matrix.os }} for ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-musl
+          - aarch64-unknown-linux-musl
+          - armv7-unknown-linux-musleabihf
+          - arm-unknown-linux-musleabihf
+          - mips-unknown-linux-musl
+          - mipsel-unknown-linux-musl
+          - mips64-unknown-linux-gnuabi64
+          - mips64el-unknown-linux-gnuabi64
+          - riscv64gc-unknown-linux-gnu
+          - i686-pc-windows-msvc
+          - x86_64-pc-windows-msvc
+          - aarch64-pc-windows-msvc
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+          - x86_64-unknown-freebsd
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            artifact_name: gpm
+            cross: true
+            strip: true
+            compress: true
+            cargo_flags: ""
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            artifact_name: gpm
+            cross: true
+            strip: false
+            compress: true
+            cargo_flags: ""
+          - os: ubuntu-latest
+            target: armv7-unknown-linux-musleabihf
+            artifact_name: gpm
+            cross: true
+            strip: false
+            compress: true
+            cargo_flags: ""
+          - os: ubuntu-latest
+            target: arm-unknown-linux-musleabihf
+            artifact_name: gpm
+            cross: true
+            strip: false
+            compress: true
+            cargo_flags: ""
+          - os: ubuntu-latest
+            target: mips-unknown-linux-musl
+            artifact_name: gpm
+            cross: true
+            strip: false
+            compress: true
+            cargo_flags: ""
+          - os: ubuntu-latest
+            target: mipsel-unknown-linux-musl
+            artifact_name: gpm
+            cross: true
+            strip: false
+            compress: true
+            cargo_flags: ""
+          - os: ubuntu-latest
+            target: mips64-unknown-linux-gnuabi64
+            artifact_name: gpm
+            cross: true
+            strip: false
+            compress: false
+            cargo_flags: ""
+          - os: ubuntu-latest
+            target: mips64el-unknown-linux-gnuabi64
+            artifact_name: gpm
+            cross: true
+            strip: false
+            compress: false
+            cargo_flags: ""
+          - os: ubuntu-latest
+            target: riscv64gc-unknown-linux-gnu
+            artifact_name: gpm
+            cross: true
+            strip: false
+            compress: false
+            cargo_flags: ""
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+            artifact_name: gpm.exe
+            cross: true
+            strip: true
+            compress: false
+            cargo_flags: ""
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: gpm.exe
+            cross: false
+            strip: true
+            compress: true
+            cargo_flags: ""
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            artifact_name: gpm.exe
+            cross: true
+            strip: true
+            compress: false
+            cargo_flags: ""
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: gpm
+            cross: false
+            strip: true
+            compress: true
+            cargo_flags: ""
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: gpm
+            cross: false
+            strip: true
+            compress: true
+            cargo_flags: ""
+          - os: ubuntu-latest
+            target: x86_64-unknown-freebsd
+            artifact_name: gpm
+            cross: true
+            strip: false
+            compress: false
+            cargo_flags: ""
+
+    env:
+      CARGO_INCREMENTAL: 0
+      RUST_BACKTRACE: full
+      CARGO_TERM_COLOR: always
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+
+      - name: cargo build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --locked --target=${{ matrix.target }} ${{ matrix.cargo_flags }}
+          use-cross: ${{ matrix.cross }}
+
+      - name: Compress binaries
+        uses: svenstaro/upx-action@v2
+        with:
+          file: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          args: --lzma
+          strip: ${{ matrix.strip }}
+        if: ${{ matrix.compress }}
+
+      - name: Create archive
+        run: tar -cvzf target/${{ matrix.target }}/release/gpm-${{ matrix.target }}.tar.gz --directory=target/${{ matrix.target }}/release ${{ matrix.artifact_name }}
+
+      ###
+      # Below this line, steps will only be ran if a tag was pushed.
+      ###
+
+      - name: Release to Github
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.repository, 'axetroy') && startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          files: |
+            target/${{ matrix.target }}/release/gpm-${{ matrix.target }}.tar.gz
+          draft: false
