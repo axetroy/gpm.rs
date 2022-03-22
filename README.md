@@ -1,6 +1,7 @@
 # gpm
 
 [![ci](https://github.com/axetroy/gpm.rs/actions/workflows/ci.yml/badge.svg)](https://github.com/axetroy/gpm.rs/actions/workflows/ci.yml)
+[![ci](https://github.com/axetroy/gpm.rs/actions/workflows/build.yml/badge.svg)](https://github.com/axetroy/gpm.rs/actions/workflows/build.yml)
 ![Latest Version](https://img.shields.io/github/v/release/axetroy/gpm.rs.svg)
 ![License](https://img.shields.io/github/license/axetroy/gpm.rs.svg)
 ![Repo Size](https://img.shields.io/github/repo-size/axetroy/gpm.rs.svg)
