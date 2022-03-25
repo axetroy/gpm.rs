@@ -10,21 +10,21 @@ A command line tool, manage your hundreds of repository, written with Rust.
 license = "MIT"
 
 [darwin]
-x86_64 = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-x86_64-apple-darwin.tar.gz"
-aarch64 = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-aarch64-apple-darwin.tar.gz"
+x86_64 = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-x86_64-apple-darwin.tar.gz"
+aarch64 = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-aarch64-apple-darwin.tar.gz"
 
 [windows]
-x86_64 = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-x86_64-pc-windows-msvc.tar.gz"
+x86_64 = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-x86_64-pc-windows-msvc.tar.gz"
 
 [linux]
-x86_64 = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-x86_64-unknown-linux-musl.tar.gz"
-arm = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-arm-unknown-linux-musleabihf.tar.gz"
-armv7 = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-armv7-unknown-linux-musleabihf.tar.gz"
-aarch64 = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-aarch64-unknown-linux-musl.tar.gz"
-mips = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-mips-unknown-linux-musl.tar.gz"
-mips64 = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-mips64-unknown-linux-gnuabi64.tar.gz"
-mips64el = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-mips64el-unknown-linux-gnuabi64.tar.gz"
-riscv64 = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-riscv64gc-unknown-linux-gnu.tar.gz"
+x86_64 = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-x86_64-unknown-linux-musl.tar.gz"
+arm = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-arm-unknown-linux-musleabihf.tar.gz"
+armv7 = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-armv7-unknown-linux-musleabihf.tar.gz"
+aarch64 = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-aarch64-unknown-linux-musl.tar.gz"
+mips = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-mips-unknown-linux-musl.tar.gz"
+mips64 = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-mips64-unknown-linux-gnuabi64.tar.gz"
+mips64el = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-mips64el-unknown-linux-gnuabi64.tar.gz"
+riscv64 = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-riscv64gc-unknown-linux-gnu.tar.gz"
 
 [freebsd]
-x86_64 = "https://github.com/svenstaro/miniserve/releases/download/v{version}/gpm-x86_64-unknown-freebsd.tar.gz"
+x86_64 = "https://github.com/axetroy/gpm.rs/releases/download/v{version}/gpm-x86_64-unknown-freebsd.tar.gz"
