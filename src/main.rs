@@ -43,6 +43,7 @@ fn main() {
         .subcommand(
             Command::new("list")
                 .alias("ls")
+                .visible_alias("ls")
                 .arg(
                     Arg::new("json")
                         .short('j')
