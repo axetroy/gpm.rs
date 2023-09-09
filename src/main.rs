@@ -281,11 +281,15 @@ fn main() {
             } else {
                 for gpm_root in rc.root {
                     let root = Path::new(&gpm_root);
-                    let repositories = walker::walk_root(root).unwrap();
-                    println!("{}", gpm_root);
+                    if root.exists() {
+                        let repositories = walker::walk_root(root).unwrap();
+                        println!("{}", gpm_root);
 
-                    for v in repositories {
-                        println!("    {}", v.as_os_str().to_str().unwrap())
+                        for v in repositories {
+                            println!("    {}", v.as_os_str().to_str().unwrap())
+                        }
+                    } else {
+                        eprintln!("can not found the root folder '{}'", gpm_root)
                     }
                 }
             }

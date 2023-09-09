@@ -62,7 +62,7 @@ impl Configure {
     pub fn add_field(&mut self, field: &str, value: &str, skip_qa: bool) -> Result<(), Report> {
         let result = match field {
             "root" => {
-                let value_normal = &value.replace('/', &std::path::MAIN_SEPARATOR.to_string());
+                let value_normal = &value.replace('/', std::path::MAIN_SEPARATOR_STR);
                 let add_abs_root_path = Path::new(value_normal).absolutize().unwrap();
 
                 if !add_abs_root_path.exists() {
@@ -125,7 +125,7 @@ impl Configure {
     pub fn set_field(&mut self, field: &str, value: &str, skip_qa: bool) -> Result<(), Report> {
         let result = match field {
             "root" => {
-                let value_normal = &value.replace('/', &std::path::MAIN_SEPARATOR.to_string());
+                let value_normal = &value.replace('/', std::path::MAIN_SEPARATOR_STR);
                 let add_abs_root_path = Path::new(value_normal).absolutize().unwrap();
 
                 if !add_abs_root_path.exists() {
