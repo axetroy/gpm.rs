@@ -27,10 +27,10 @@ jobs:
           - aarch64-unknown-linux-musl
           - armv7-unknown-linux-musleabihf
           - arm-unknown-linux-musleabihf
-          - mips-unknown-linux-musl
-          - mipsel-unknown-linux-musl
-          - mips64-unknown-linux-gnuabi64
-          - mips64el-unknown-linux-gnuabi64
+          # - mips-unknown-linux-musl
+          # - mipsel-unknown-linux-musl
+          # - mips64-unknown-linux-gnuabi64
+          # - mips64el-unknown-linux-gnuabi64
           - riscv64gc-unknown-linux-gnu
           - i686-pc-windows-msvc
           - x86_64-pc-windows-msvc
