@@ -67,34 +67,34 @@ jobs:
             strip: false
             compress: true
             cargo_flags: ""
-          - os: ubuntu-latest
-            target: mips-unknown-linux-musl
-            artifact_name: gpm
-            cross: true
-            strip: false
-            compress: true
-            cargo_flags: ""
-          - os: ubuntu-latest
-            target: mipsel-unknown-linux-musl
-            artifact_name: gpm
-            cross: true
-            strip: false
-            compress: true
-            cargo_flags: ""
-          - os: ubuntu-latest
-            target: mips64-unknown-linux-gnuabi64
-            artifact_name: gpm
-            cross: true
-            strip: false
-            compress: false
-            cargo_flags: ""
-          - os: ubuntu-latest
-            target: mips64el-unknown-linux-gnuabi64
-            artifact_name: gpm
-            cross: true
-            strip: false
-            compress: false
-            cargo_flags: ""
+          # - os: ubuntu-latest
+          #   target: mips-unknown-linux-musl
+          #   artifact_name: gpm
+          #   cross: true
+          #   strip: false
+          #   compress: true
+          #   cargo_flags: ""
+          # - os: ubuntu-latest
+          #   target: mipsel-unknown-linux-musl
+          #   artifact_name: gpm
+          #   cross: true
+          #   strip: false
+          #   compress: true
+          #   cargo_flags: ""
+          # - os: ubuntu-latest
+          #   target: mips64-unknown-linux-gnuabi64
+          #   artifact_name: gpm
+          #   cross: true
+          #   strip: false
+          #   compress: false
+          #   cargo_flags: ""
+          # - os: ubuntu-latest
+          #   target: mips64el-unknown-linux-gnuabi64
+          #   artifact_name: gpm
+          #   cross: true
+          #   strip: false
+          #   compress: false
+          #   cargo_flags: ""
           - os: ubuntu-latest
             target: riscv64gc-unknown-linux-gnu
             artifact_name: gpm
