@@ -46,7 +46,8 @@ $ gpm clone https://github.com/axetroy/gpm.rs -- --progress --recursive
 | Command                            | Description                        |
 | ---------------------------------- | ---------------------------------- |
 | gpm clone \<REMOTE\> [OPTIONS]     | Clones repository                  |
-| gpm open \<REMOTE\>                | Open repository with file explorer |
+| gpm open \<REMOTE_OR_PATH\>        | Open repository with file explorer |
+| gpm vscode \<REMOTE_OR_PATH\>      | Open repository with vscode        |
 | gpm list                           | List repositories                  |
 | gpm config                         | Print configure                    |
 | gpm config add \<FIELD\> \<VALUE\> | Add configure for a field          |

@@ -4,6 +4,7 @@ mod configure;
 mod file_explorer;
 mod git;
 mod util;
+mod vscode;
 mod walker;
 
 use clap::{arg, Arg, Command, PossibleValue};
@@ -15,6 +16,25 @@ use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process;
+
+fn select_folder(paths: Vec<PathBuf>, title: &str) -> Option<PathBuf> {
+    if paths.is_empty() {
+        return None;
+    }
+
+    if paths.len() == 1 {
+        return Some(paths[0].clone());
+    }
+
+    let options: Vec<&str> = paths.iter().map(|p| p.to_str().unwrap()).collect();
+
+    let ans: Result<&str, InquireError> = Select::new(title, options).prompt();
+
+    match ans {
+        Ok(choice) => Some(PathBuf::from(choice)),
+        Err(_) => None,
+    }
+}
 
 fn main() {
     let version = format!("v{}", env!("CARGO_PKG_VERSION"));
@@ -56,7 +76,12 @@ fn main() {
         .subcommand(
             Command::new("open")
                 .about("Open repository with file explorer")
-                .arg(arg!(<REMOTE> "The remote Git URL to clone")),
+                .arg(arg!(<REMOTE_OR_PATH> "The remote Git URL to open")),
+        )
+        .subcommand(
+            Command::new("vscode")
+                .about("Open repository with vscode")
+                .arg(arg!(<REMOTE_OR_PATH> "The remote Git URL or folder path to open")),
         )
         .subcommand(
             Command::new("config")
@@ -295,7 +320,16 @@ fn main() {
             }
         }
         Some(("open", sub_matches)) => {
-            let url = sub_matches.value_of("REMOTE").expect("required");
+            let url = sub_matches.value_of("REMOTE_OR_PATH").expect("required");
+
+            let path = Path::new(url);
+
+            if path.is_absolute() {
+                vscode::open(path).unwrap();
+
+                process::exit(0x0);
+            }
+
             let mut found: Vec<PathBuf> = vec![];
 
             for gpm_root in rc.root {
@@ -311,26 +345,40 @@ fn main() {
                 process::exit(0x1);
             }
 
-            if found.len() == 1 {
-                println!(
-                    "Found the repository '{}'",
-                    found[0].as_os_str().to_str().unwrap()
-                );
-                file_explorer::open(&found[0]);
+            match select_folder(found, "Select a repository to open: ") {
+                Some(folder) => file_explorer::open(&folder),
+                None => process::exit(0x0),
+            }
+        }
+        Some(("vscode", sub_matches)) => {
+            let url = sub_matches.value_of("REMOTE_OR_PATH").expect("required");
+
+            let path = Path::new(url);
+
+            if path.is_absolute() {
+                vscode::open(path).unwrap();
+
                 process::exit(0x0);
             }
 
-            let options: Vec<&str> = found
-                .iter()
-                .map(|s| s.as_os_str().to_str().unwrap())
-                .collect();
+            let mut found: Vec<PathBuf> = vec![];
 
-            let ans: Result<&str, InquireError> =
-                Select::new("Select a repository to open:", options).prompt();
+            for gpm_root in rc.root {
+                let repo_dir = git::url_to_path(&gpm_root, url).unwrap();
 
-            match ans {
-                Ok(choice) => file_explorer::open(Path::new(choice)),
-                Err(_) => process::exit(0x0),
+                if repo_dir.exists() && repo_dir.is_dir() {
+                    found.push(repo_dir.to_path_buf());
+                }
+            }
+
+            if found.is_empty() {
+                println!("Could not found the cloned repository '{}'", url);
+                process::exit(0x1);
+            }
+
+            match select_folder(found, "Found projects, select to open: ") {
+                Some(folder) => vscode::open(&folder).unwrap(),
+                None => process::exit(0x0),
             }
         }
         Some((ext, sub_matches)) => {

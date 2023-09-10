@@ -27,6 +27,7 @@ serde_json = "1.0.79"
 inquire = { version = "0.2.1" }
 eyre = "0.6.7"
 path-absolutize = "3.0.11"
+which = "4.4.2"
 
 [profile.release]
 # https://github.com/johnthagen/min-sized-rust
