@@ -37,7 +37,7 @@ jobs:
           - aarch64-pc-windows-msvc
           - x86_64-apple-darwin
           - aarch64-apple-darwin
-          - x86_64-unknown-freebsd
+          # - x86_64-unknown-freebsd
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
@@ -137,13 +137,13 @@ jobs:
             strip: true
             compress: true
             cargo_flags: ""
-          - os: ubuntu-latest
-            target: x86_64-unknown-freebsd
-            artifact_name: gpm
-            cross: true
-            strip: false
-            compress: false
-            cargo_flags: ""
+          # - os: ubuntu-latest
+          #   target: x86_64-unknown-freebsd
+          #   artifact_name: gpm
+          #   cross: true
+          #   strip: false
+          #   compress: false
+          #   cargo_flags: ""
 
     env:
       CARGO_INCREMENTAL: 0
