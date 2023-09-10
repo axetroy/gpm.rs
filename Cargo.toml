@@ -19,14 +19,14 @@ path = "src/main.rs"
 
 [dependencies]
 clap = "3.1.2"
-git-url-parse = "0.4.0"
-ctrlc = { version = "3.2.1", features = ["termination"] }
-dirs = "1.0.4"
-serde = { version = "1.0.136", features = ["derive"] }
-serde_json = "1.0.79"
+git-url-parse = "0.4.4"
+ctrlc = { version = "3.4.1", features = ["termination"] }
+dirs = "5.0.1"
+serde = { version = "1.0.188", features = ["derive"] }
+serde_json = "1.0.106"
 inquire = { version = "0.2.1" }
-eyre = "0.6.7"
-path-absolutize = "3.0.11"
+eyre = "0.6.8"
+path-absolutize = "3.1.1"
 which = "4.4.2"
 
 [profile.release]
