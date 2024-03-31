@@ -44,42 +44,42 @@ jobs:
             artifact_name: gpm
             cross: true
             strip: true
-            compress: true
+            compress: false
             cargo_flags: ""
           - os: ubuntu-latest
             target: aarch64-unknown-linux-musl
             artifact_name: gpm
             cross: true
             strip: false
-            compress: true
+            compress: false
             cargo_flags: ""
           - os: ubuntu-latest
             target: armv7-unknown-linux-musleabihf
             artifact_name: gpm
             cross: true
             strip: false
-            compress: true
+            compress: false
             cargo_flags: ""
           - os: ubuntu-latest
             target: arm-unknown-linux-musleabihf
             artifact_name: gpm
             cross: true
             strip: false
-            compress: true
+            compress: false
             cargo_flags: ""
           # - os: ubuntu-latest
           #   target: mips-unknown-linux-musl
           #   artifact_name: gpm
           #   cross: true
           #   strip: false
-          #   compress: true
+          #   compress: false
           #   cargo_flags: ""
           # - os: ubuntu-latest
           #   target: mipsel-unknown-linux-musl
           #   artifact_name: gpm
           #   cross: true
           #   strip: false
-          #   compress: true
+          #   compress: false
           #   cargo_flags: ""
           # - os: ubuntu-latest
           #   target: mips64-unknown-linux-gnuabi64
@@ -114,7 +114,7 @@ jobs:
             artifact_name: gpm.exe
             cross: false
             strip: true
-            compress: true
+            compress: false
             cargo_flags: ""
           - os: windows-latest
             target: aarch64-pc-windows-msvc
@@ -128,14 +128,14 @@ jobs:
             artifact_name: gpm
             cross: false
             strip: true
-            compress: true
+            compress: false
             cargo_flags: ""
           - os: macos-latest
             target: aarch64-apple-darwin
             artifact_name: gpm
             cross: false
             strip: true
-            compress: true
+            compress: false
             cargo_flags: ""
           # - os: ubuntu-latest
           #   target: x86_64-unknown-freebsd
